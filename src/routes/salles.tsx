@@ -68,6 +68,7 @@ function Salles() {
               {GROUPS.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
             </select>
             <button onClick={() => setFull(true)} className="rounded-xl border border-border px-3 py-2 text-sm font-semibold">Plein écran</button>
+            <a href={`${g.pdf}#page=${g.page}`} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-border px-3 py-2 text-sm font-semibold">Voir le PDF officiel (p. {g.page})</a>
             <a href={g.pdf} download className="rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">Télécharger le PDF</a>
           </div>
           <DetailedTimetable key={g.id} group={g.id} />

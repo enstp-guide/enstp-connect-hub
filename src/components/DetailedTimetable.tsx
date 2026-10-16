@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import data from "@/lib/edt-data.json";
+import { STRUCTURE, sessionMatches } from "@/lib/edt-structure";
 
 type S = { day: string; start: string; end: string; subject: string; teacher: string; room: string; kind: string; sections: string[] };
 const DAYS: Record<string, string> = { Saturday: "Samedi", Sunday: "Dimanche", Monday: "Lundi", Tuesday: "Mardi", Wednesday: "Mercredi", Thursday: "Jeudi" };
@@ -7,26 +8,27 @@ const DAYS: Record<string, string> = { Saturday: "Samedi", Sunday: "Dimanche", M
 export function DetailedTimetable({ group }: { group: string }) {
   const g = (data as Record<string, { sessions: S[] }>)[group];
   const sessions = g?.sessions ?? [];
-  const sections = useMemo(
-    () => [...new Set(sessions.flatMap((s) => s.sections).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr", { numeric: true })),
-    [sessions],
-  );
+  const st = STRUCTURE[group];
   const days = Object.keys(DAYS).filter((d) => sessions.some((s) => s.day === d));
   const [sec, setSec] = useState("");
   const [day, setDay] = useState("");
   const curDay = days.includes(day) ? day : days[0];
-  const list = sessions.filter((s) => s.day === curDay && (!sec || s.sections.includes(sec)));
+  const list = sessions.filter((s) => s.day === curDay && sessionMatches(group, s, sec));
 
   if (!sessions.length) return null;
   return (
     <div className="mt-4 space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <label htmlFor="sec" className="text-sm font-semibold">Ma section / mon groupe</label>
-        <select id="sec" value={sec} onChange={(e) => setSec(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2 text-sm">
-          <option value="">Toutes</option>
-          {sections.map((s) => <option key={s} value={s}>{/^\d+$/.test(s) ? `Section ${s}` : s}</option>)}
-        </select>
-      </div>
+      {st && <p className="text-sm font-semibold text-primary">{st.summary}</p>}
+      {st?.note && <p className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs">{st.note}</p>}
+      {st && !st.promo && (
+        <div className="flex flex-wrap items-center gap-2">
+          <label htmlFor="sec" className="text-sm font-semibold">Mon {st.unitName.toLowerCase()}</label>
+          <select id="sec" value={sec} onChange={(e) => setSec(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2 text-sm">
+            <option value="">Tous</option>
+            {st.units.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+          </select>
+        </div>
+      )}
       <div className="flex gap-1 overflow-x-auto" role="tablist">
         {days.map((d) => (
           <button key={d} role="tab" aria-selected={d === curDay} onClick={() => setDay(d)}
@@ -47,7 +49,7 @@ export function DetailedTimetable({ group }: { group: string }) {
                 {s.teacher && <p className="text-muted-foreground">{s.teacher}</p>}
                 <p className="mt-1 text-xs">
                   {s.room && <span className="mr-2 rounded bg-muted px-1.5 py-0.5 font-semibold">Salle {s.room}</span>}
-                  {s.sections.length > 0 && <span className="text-muted-foreground">{s.sections.length > 3 ? `${s.sections.length} sections` : s.sections.join(", ")}</span>}
+                  {s.sections.length > 0 && <span className="text-muted-foreground">{s.sections.length > 3 ? "Plusieurs groupes" : s.sections.join(", ")}</span>}
                 </p>
               </div>
             </li>
