@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Reuse the school page through its embedded mode in the legacy guide; origin- and source-checked resize messages keep all content visible without duplicating school content.
+- Render the student association introduction inline in guide help using the shared section styling and explicit Arabic RTL attributes, without external application links.
+- Render assistant language sections with AI Elements MessageResponse and explicit language/direction attributes; keep model language instructions on the server.
