@@ -118,7 +118,7 @@ function Aide() {
             {(tab === "wilayas" || tab === "knowledge") && uid === null && (
               <div className="grid place-items-center py-16 text-center">
                 <p className="text-sm font-semibold">{t.login}</p>
-                <Link to="/" target={embed ? "_top" : undefined} className="mt-3 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
+                <Link to="/" target={embed ? "_top" : "_self"} className="mt-3 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
               </div>
             )}
             {tab === "wilayas" && uid && <Wilayas t={t} uid={uid} name={name} />}
