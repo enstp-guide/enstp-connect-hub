@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/BackLink";
 import video from "@/assets/ecole-presentation.mp4.asset.json";
@@ -58,6 +59,7 @@ function Aide() {
   return (
     <main className="min-h-screen bg-background px-4 py-8 text-foreground">
       <div className="mx-auto max-w-4xl">
+        <Toaster />
         <BackLink />
         <div dir={dir} lang={lang} className="overflow-hidden rounded-2xl border border-border bg-muted/40 shadow-sm" style={{ fontFamily: lang === "ar" ? "'Cairo', Tahoma, sans-serif" : undefined }}>
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-3">
@@ -135,7 +137,7 @@ function Wilayas({ t, uid, name }: { t: TT; uid: string; name: string }) {
     setBusy(true);
     const { data, error } = await supabase.from("wilaya_posts").insert({ user_id: uid, author_name: name, wilaya_code: sel, content: c.slice(0, 1000) }).select().single();
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setPosts((p) => [data, ...p]);
     setText("");
   }
@@ -201,21 +203,21 @@ function Knowledge({ t, uid, name }: { t: TT; uid: string; name: string }) {
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!file || !title.trim()) return;
-    if (file.size > 20 * 1024 * 1024) return toast.error("20 MB max");
+    if (file.size > 20 * 1024 * 1024) { toast.error("20 MB max"); return; }
     setBusy(true);
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
     const path = `${uid}/${crypto.randomUUID()}${ext ? "." + ext : ""}`;
     const up = await supabase.storage.from("knowledge").upload(path, file, { contentType: file.type });
-    if (up.error) { setBusy(false); return toast.error(up.error.message); }
+    if (up.error) { setBusy(false); { toast.error(up.error.message); return; } }
     const { data, error } = await supabase.from("shared_files").insert({ user_id: uid, author_name: name, title: title.trim().slice(0, 150), path, file_type: ext.toUpperCase() }).select().single();
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setFiles((f) => [data, ...f]);
     setTitle(""); setFile(null); setOpen(false);
   }
   async function download(f: FileRow) {
     const { data, error } = await supabase.storage.from("knowledge").createSignedUrl(f.path, 120);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     window.open(data.signedUrl, "_blank", "noopener");
   }
   async function remove(f: FileRow) {
