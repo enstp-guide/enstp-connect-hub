@@ -16,3 +16,4 @@
 - [x] Read-aloud narration on L’École (browser voice)
 - [ ] Generated video with spoken voice — needs AI credits
 - [x] Further performance pass
+- [x] مجتمع ENSTP help center (/aide): video, 58 wilaya groups, file sharing, AR/FR/EN
