@@ -387,7 +387,7 @@ function AuthFlow() {
   );
 }
 
-function translate(error: { message: string; code?: string; status?: number }) {
+function translate(error: { message: string; code?: string | undefined; status?: number | undefined }) {
   const c = error.code ?? "";
   const msg = error.message ?? "";
   if (c === "email_not_confirmed" || /not confirmed/i.test(msg)) return "Votre email n’est pas encore confirmé. Cliquez sur le lien reçu par email (vérifiez vos spams).";
