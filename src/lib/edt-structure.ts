@@ -12,9 +12,9 @@ export const STRUCTURE: Record<string, Structure> = {
   CP1: { summary: "1ère année Prépa : 10 groupes répartis sur 2 sections", unitName: "Groupe", units: range(10, (i) => `Groupe ${i}`) },
   CP2: { summary: "2ème année Prépa : 12 groupes répartis sur 2 sections", unitName: "Groupe", units: range(12, (i) => `Groupe ${i}`) },
   DIB1: {
-    summary: "3ème année DIB : 4 groupes / sections — colonnes = numéros de salles",
-    unitName: "Salle",
-    units: ["2", "6", "7", "8", "9", "25"].map((r) => ({ value: r, label: `Salle ${r}` })),
+    summary: "3ème année DIB : 4 groupes — Groupe 1 = Salle 7, Groupe 2 = Salle 8, Groupe 3 = Salle 9, Groupe 4 = Salle 25",
+    unitName: "Groupe",
+    units: [["7", 1], ["8", 2], ["9", 3], ["25", 4]].map(([r, g]) => ({ value: String(r), label: `Groupe ${g} · Salle ${r}` })),
     note: roomNote,
   },
   DMS1: { summary: "3ème année DMS : 4 groupes / sections", unitName: "Section", units: range(4, (i) => `Section ${i}`, (i) => `SEC ${i}`) },
