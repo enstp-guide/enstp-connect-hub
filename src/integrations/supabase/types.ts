@@ -166,6 +166,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          parent_id: string | null
           user_id: string
           wilaya_code: number
         }
@@ -174,6 +175,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          parent_id?: string | null
           user_id: string
           wilaya_code: number
         }
@@ -182,10 +184,19 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          parent_id?: string | null
           user_id?: string
           wilaya_code?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "wilaya_posts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "wilaya_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
