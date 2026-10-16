@@ -204,6 +204,7 @@ function AuthFlow() {
   const [err, setErr] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false);
 
   function go(v: View) {
     setErr("");
@@ -299,7 +300,7 @@ function AuthFlow() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setBusy(false);
-    if (error) return setErr(translate(error.message));
+    if (error) { console.error("[forgot]", error); return setErr(translate(error)); }
     setInfo("Si un compte existe avec cet email, un lien de réinitialisation vient d’être envoyé. Pensez à vérifier vos spams.");
   }
 
@@ -318,7 +319,7 @@ function AuthFlow() {
             <Field label="Email">
               <input className={inputCls} type="email" dir="ltr" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </Field>
-            <button className={btnCls} disabled={busy}>Envoyer le lien</button>
+            <button className={btnCls} disabled={busy}>{busy ? "Envoi…" : "Envoyer le lien"}</button>
             <button type="button" onClick={() => go("login")} className="text-xs text-muted-foreground underline">
               Retour à la connexion
             </button>
@@ -370,21 +371,31 @@ function AuthFlow() {
               </button>
             )}
             <button className={btnCls} disabled={busy}>
-              {view === "login" ? "Se connecter" : "S’inscrire"}
+              {busy ? "Chargement…" : view === "login" ? "Se connecter" : "S’inscrire"}
             </button>
           </form>
         </>
       )}
       {err && <p role="alert" className="mt-4 text-sm font-medium text-destructive">{err}</p>}
+      {err && unconfirmed && view === "login" && (
+        <button type="button" onClick={resend} disabled={busy} className="mt-2 text-xs font-semibold text-primary underline">
+          Renvoyer l’email de confirmation
+        </button>
+      )}
       {info && <p className="mt-4 text-sm font-medium text-primary">{info}</p>}
     </Shell>
   );
 }
 
-function translate(msg: string) {
-  if (/invalid login/i.test(msg)) return "Email ou mot de passe incorrect.";
-  if (/already registered|already exists/i.test(msg)) return "Un compte existe déjà avec cet email. Connectez-vous.";
-  if (/rate limit|too many/i.test(msg)) return "Trop de tentatives. Patientez une minute puis réessayez.";
-  if (/weak|pwned|password/i.test(msg)) return "Mot de passe trop faible. Choisissez-en un plus robuste.";
-  return "Une erreur est survenue. Réessayez.";
+function translate(error: { message: string; code?: string; status?: number }) {
+  const c = error.code ?? "";
+  const msg = error.message ?? "";
+  if (c === "email_not_confirmed" || /not confirmed/i.test(msg)) return "Votre email n’est pas encore confirmé. Cliquez sur le lien reçu par email (vérifiez vos spams).";
+  if (c === "invalid_credentials" || /invalid login/i.test(msg)) return "Email ou mot de passe incorrect.";
+  if (c === "user_already_exists" || /already registered|already exists/i.test(msg)) return "Un compte existe déjà avec cet email. Connectez-vous.";
+  if (c.includes("rate_limit") || error.status === 429 || /rate limit|too many|security purposes/i.test(msg)) return "Trop de tentatives. Patientez une minute puis réessayez.";
+  if (c === "weak_password" || /weak|pwned/i.test(msg)) return "Mot de passe trop faible ou trop connu. Choisissez-en un plus robuste.";
+  if (c === "user_banned") return "Ce compte a été suspendu.";
+  if (/fetch|network/i.test(msg)) return "Impossible de joindre le serveur. Vérifiez votre connexion internet.";
+  return `Erreur : ${msg || "inconnue"}. Réessayez.`;
 }
