@@ -32,7 +32,9 @@ const signUpSchema = z.object({
   lastName: z.string().trim().min(1, "Nom requis").max(60),
   email: z.string().trim().email("Email invalide").max(255),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères").max(72),
-});
+  year: z.number({ message: "Choisissez votre année" }).int().min(1, "Choisissez votre année").max(5),
+  specialty: z.enum(["DIB", "DMS"]).nullable(),
+}).refine((d) => d.year <= 2 || d.specialty !== null, { message: "Choisissez votre spécialité (DIB ou DMS)" });
 
 type Profile = {
   first_name: string;
@@ -201,6 +203,8 @@ function AuthFlow() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [year, setYear] = useState(0);
+  const [specialty, setSpecialty] = useState<"DIB" | "DMS" | "">("");
   const [err, setErr] = useState("");
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
@@ -217,7 +221,7 @@ function AuthFlow() {
     if (busy) return;
     setErr("");
     setInfo("");
-    const parsed = signUpSchema.safeParse({ firstName, lastName, email, password });
+    const parsed = signUpSchema.safeParse({ firstName, lastName, email, password, year, specialty: year > 2 && specialty ? specialty : null });
     if (!parsed.success) return setErr(parsed.error.issues[0]?.message ?? "Champs invalides");
     const d = parsed.data;
     setBusy(true);
@@ -227,7 +231,7 @@ function AuthFlow() {
         password: d.password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { first_name: d.firstName, last_name: d.lastName },
+          data: { first_name: d.firstName, last_name: d.lastName, academic_year: String(d.year), specialty: d.year > 2 ? d.specialty : null },
         },
       });
       if (error) {
@@ -351,6 +355,29 @@ function AuthFlow() {
                 <Field label="Nom">
                   <input className={inputCls} value={lastName} maxLength={60} autoComplete="family-name" onChange={(e) => setLastName(e.target.value)} />
                 </Field>
+              </div>
+            )}
+            {view === "signup" && (
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Année d’étude">
+                  <select className={inputCls} value={year} onChange={(e) => setYear(Number(e.target.value))}>
+                    <option value={0}>Choisir…</option>
+                    <option value={1}>1ère année (Prépa)</option>
+                    <option value={2}>2ème année (Prépa)</option>
+                    <option value={3}>3ème année</option>
+                    <option value={4}>4ème année</option>
+                    <option value={5}>5ème année</option>
+                  </select>
+                </Field>
+                {year > 2 && (
+                  <Field label="Spécialité">
+                    <select className={inputCls} value={specialty} onChange={(e) => setSpecialty(e.target.value as "DIB" | "DMS" | "")}>
+                      <option value="">Choisir…</option>
+                      <option value="DIB">DIB – Infrastructures et Bâtiment</option>
+                      <option value="DMS">DMS – Matériaux et Structures</option>
+                    </select>
+                  </Field>
+                )}
               </div>
             )}
             <Field label="Email (personnel ou d’école)">
