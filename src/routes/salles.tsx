@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/BackLink";
 import { Assistant } from "@/components/LazyAssistant";
+import { DetailedTimetable } from "@/components/DetailedTimetable";
 import { GROUPS, PLACES, groupFor, routeBetween } from "@/lib/enstp-data";
 
 export const Route = createFileRoute("/salles")({
@@ -69,7 +70,9 @@ function Salles() {
             <button onClick={() => setFull(true)} className="rounded-xl border border-border px-3 py-2 text-sm font-semibold">Plein écran</button>
             <a href={g.pdf} download className="rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground">Télécharger le PDF</a>
           </div>
-          <button onClick={() => setFull(true)} className="mt-4 block w-full overflow-hidden rounded-xl border border-border bg-muted" aria-label="Agrandir l’emploi du temps">
+          <DetailedTimetable key={g.id} group={g.id} />
+          <p className="mt-6 text-sm font-semibold">Emploi du temps officiel</p>
+          <button onClick={() => setFull(true)} className="mt-2 block w-full overflow-hidden rounded-xl border border-border bg-muted" aria-label="Agrandir l’emploi du temps">
             <img key={g.id} src={g.img} alt={`Emploi du temps ${g.label}`} className="w-full" loading="lazy" decoding="async" />
           </button>
         </section>
