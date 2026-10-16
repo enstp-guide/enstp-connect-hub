@@ -10,12 +10,15 @@ export function yearLabel(y: number | null | undefined): string {
   return y === 1 ? "1ère année" : `${y}ème année`;
 }
 
-/** "[Nom] [Prénom] - [Année] - [Spécialité]" */
+/** "[Prénom] [Nom] • [Année] [Spécialité]" — Prépa for years 1–2. */
 export function displayName(p: NameParts | null | undefined, fallback = ""): string {
   if (!p) return fallback;
-  const who = `${(p.last_name ?? "").trim()} ${(p.first_name ?? "").trim()}`.trim();
+  const who = `${(p.first_name ?? "").trim()} ${(p.last_name ?? "").trim()}`.trim();
   if (!who) return fallback;
-  return [who, yearLabel(p.academic_year), p.specialty ?? ""].filter(Boolean).join(" - ");
+  const y = p.academic_year;
+  if (!y) return who;
+  const spec = y <= 2 ? "Prépa" : (p.specialty ?? "");
+  return `${who} • ${[yearLabel(y), spec].filter(Boolean).join(" ")}`;
 }
 
 export function isProfileComplete(p: NameParts | null | undefined): boolean {
@@ -26,6 +29,6 @@ export function isProfileComplete(p: NameParts | null | undefined): boolean {
     p.academic_year &&
     p.academic_year >= 1 &&
     p.academic_year <= 5 &&
-    (p.specialty === "DIB" || p.specialty === "DMS")
+    (p.academic_year <= 2 || p.specialty === "DIB" || p.specialty === "DMS")
   );
 }

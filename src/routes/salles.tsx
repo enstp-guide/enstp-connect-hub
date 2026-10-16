@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/BackLink";
 import { Assistant } from "@/components/LazyAssistant";
-import { GROUPS, PLACES, groupFor } from "@/lib/enstp-data";
+import { GROUPS, PLACES, groupFor, routeBetween } from "@/lib/enstp-data";
 
 export const Route = createFileRoute("/salles")({
   head: () => ({
@@ -24,6 +24,7 @@ function Salles() {
   const [group, setGroup] = useState("CP1");
   const [place, setPlace] = useState(PLACES[0]!.id);
   const [q, setQ] = useState("");
+  const [from, setFrom] = useState("entree");
   const [full, setFull] = useState(false);
   const [zoom, setZoom] = useState(1);
 
@@ -105,9 +106,16 @@ function Salles() {
           </div>
           <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-xs font-bold uppercase tracking-widest text-primary">{sel.zone}</p>
-            <h2 className="mt-1 text-2xl font-extrabold">Entrée principale → {sel.name}</h2>
+            <label className="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold">
+              Départ :
+              <select value={from} onChange={(e) => setFrom(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-1.5 text-sm">
+                <option value="entree">Entrée principale</option>
+                {PLACES.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </label>
+            <h2 className="mt-2 text-2xl font-extrabold">{from === "entree" ? "Entrée principale" : PLACES.find((p) => p.id === from)?.name} → {sel.name}</h2>
             <ol className="mt-4 space-y-3">
-              {sel.steps.map((s, i) => (
+              {(from === "entree" ? sel.steps : routeBetween(from, sel.id)).map((s, i) => (
                 <li key={i} className="flex gap-3">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{i + 1}</span>
                   <p className="pt-0.5 text-sm">{s}</p>

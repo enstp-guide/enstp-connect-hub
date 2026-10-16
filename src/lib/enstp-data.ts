@@ -87,3 +87,18 @@ Plateforme ENSTP Go : connexion par email (personnel ou d’école) + mot de pas
 Contenu complet du guide :
 ${GUIDE_KB}
 `;
+
+/** Text itinerary between two places via the main entrance hub.
+ *  Kept as a pure function so a graph-based campus map can replace it later. */
+export function routeBetween(fromId: string, toId: string): string[] {
+  const a = PLACES.find((p) => p.id === fromId);
+  const b = PLACES.find((p) => p.id === toId);
+  if (!a || !b) return [];
+  if (a.id === b.id) return [`Vous êtes déjà à : ${a.name}.`];
+  if (a.zone === b.zone)
+    return [`Depuis ${a.name}, restez dans la zone « ${a.zone} ».`, ...b.steps.slice(-1)];
+  return [
+    `Sortez de ${a.name} (${a.zone}) et rejoignez l’allée centrale.`,
+    ...b.steps.map((s) => s.replace(/^Entrée principale\s*[:,]?\s*/i, "")),
+  ];
+}
