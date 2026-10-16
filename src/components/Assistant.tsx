@@ -22,10 +22,7 @@ import {
 import { splitTrilingual } from "@/lib/trilingual";
 import { browserLanguage, detectLanguage, UI_TEXT, type Lang } from "@/lib/detect-language";
 import { supabase } from "@/integrations/supabase/client";
-import think from "@/assets/avatar/think.webp.asset.json";
-import load from "@/assets/avatar/load.webp.asset.json";
-import hai from "@/assets/avatar/hai.webp.asset.json";
-import bye from "@/assets/avatar/bye.webp.asset.json";
+import mascot from "@/assets/mascot.jpg";
 
 type Thread = { id: string; title: string; updated_at: string };
 
@@ -91,7 +88,7 @@ export function Assistant() {
   }
 
   const avatar =
-    flash === "hai" ? hai.url : flash === "bye" ? bye.url : busy ? load.url : think.url;
+    mascot;
 
   return (
     <>
