@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EcoleRouteImport } from './routes/ecole'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SallesRouteImport } from './routes/salles'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EcoleRoute = EcoleRouteImport.update({
+  id: '/ecole',
+  path: '/ecole',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SallesRoute = SallesRouteImport.update({
+  id: '/salles',
+  path: '/salles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ecole': typeof EcoleRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/salles': typeof SallesRoute
+  '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ecole': typeof EcoleRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/salles': typeof SallesRoute
+  '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ecole': typeof EcoleRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/salles': typeof SallesRoute
+  '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
+  id: '__root__' | '/' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EcoleRoute: typeof EcoleRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SallesRoute: typeof SallesRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ecole': {
+      id: '/ecole'
+      path: '/ecole'
+      fullPath: '/ecole'
+      preLoaderRoute: typeof EcoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salles': {
+      id: '/salles'
+      path: '/salles'
+      fullPath: '/salles'
+      preLoaderRoute: typeof SallesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EcoleRoute: EcoleRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SallesRoute: SallesRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

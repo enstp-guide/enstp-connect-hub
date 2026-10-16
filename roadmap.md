@@ -1,0 +1,18 @@
+# Roadmap
+- [x] Render the Arabic student association introduction inline in Help and Guidance without external links
+- [x] Move pharmacy searches to Food and Groceries in all guide languages
+- [x] Place full school introduction above guide modules
+- [x] Provide and verify structured French / English / Arabic assistant responses
+- [x] Présentation de l'ENSTP section
+- [x] Timetables shown as images + download + fullscreen (no blocked PDF)
+- [x] Remove top menu; "Salles & cours" card opens room finder; L'École link in guide menu
+- [x] Animated chibi presentation video on L'École
+- [x] Assistant knows entire guide content
+- [ ] OTP code in email — needs the user's email domain
+- [ ] Interactive campus map — waiting on campus plan
+- [x] Assistant icon cleaned into green circle
+- [x] Auto language detection (assistant + UI)
+- [x] Dark mode toggle
+- [x] Read-aloud narration on L’École (browser voice)
+- [ ] Generated video with spoken voice — needs AI credits
+- [x] Further performance pass
