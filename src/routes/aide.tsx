@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,10 @@ import { BackLink } from "@/components/BackLink";
 import video from "@/assets/ecole-presentation.mp4.asset.json";
 
 export const Route = createFileRoute("/aide")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    embed: search["embed"] === true || search["embed"] === "true",
+    lang: (["ar", "fr", "en"].includes(String(search["lang"])) ? String(search["lang"]) : undefined) as Lang | undefined,
+  }),
   head: () => ({
     meta: [
       { title: "مجتمع ENSTP · Centre d’aide" },
@@ -35,7 +39,9 @@ type Post = { id: string; user_id: string; author_name: string; wilaya_code: num
 type FileRow = { id: string; user_id: string; author_name: string; title: string; path: string; file_type: string; created_at: string };
 
 function Aide() {
-  const [lang, setLang] = useState<Lang>("ar");
+  const { embed, lang: initial } = Route.useSearch();
+  const root = useRef<HTMLElement>(null);
+  const [lang, setLang] = useState<Lang>(initial ?? "ar");
   const [tab, setTab] = useState<Tab>("home");
   const [uid, setUid] = useState<string | null | undefined>(undefined);
   const [name, setName] = useState("");
@@ -43,7 +49,7 @@ function Aide() {
 
   useEffect(() => {
     const saved = localStorage.getItem("hw-lang") as Lang | null;
-    if (saved && saved in T) setLang(saved);
+    if (!initial && saved && saved in T) setLang(saved);
     supabase.auth.getUser().then(async ({ data }) => {
       setUid(data.user?.id ?? null);
       if (!data.user) return;
@@ -52,17 +58,27 @@ function Aide() {
     });
   }, []);
 
+  useEffect(() => {
+    const el = root.current;
+    if (!embed || !el) return;
+    const report = () => window.parent.postMessage({ type: "enstp-aide-height", height: Math.ceil(el.getBoundingClientRect().height) }, window.location.origin);
+    const ob = new ResizeObserver(report);
+    ob.observe(el);
+    report();
+    return () => ob.disconnect();
+  }, [embed]);
+
   const changeLang = (l: Lang) => { setLang(l); localStorage.setItem("hw-lang", l); };
   const dir = lang === "ar" ? "rtl" : "ltr";
   const tabs: [Tab, string][] = [["home", t.navHome], ["video", t.navVideo], ["wilayas", t.navWilayas], ["knowledge", t.navKnowledge]];
 
   return (
-    <main className="min-h-screen bg-background px-4 py-8 text-foreground">
+    <main ref={root} className={embed ? "bg-background text-foreground" : "min-h-screen bg-background px-4 py-8 text-foreground"}>
       <div className="mx-auto max-w-4xl">
         <Toaster />
-        <BackLink />
-        <div dir={dir} lang={lang} className="overflow-hidden rounded-2xl border border-border bg-muted/40 shadow-sm" style={{ fontFamily: lang === "ar" ? "'Cairo', Tahoma, sans-serif" : undefined }}>
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-3">
+        {!embed && <BackLink />}
+        <div dir={dir} lang={lang} className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3">
             <div className="flex items-center gap-2.5">
               <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-lg font-extrabold text-primary-foreground">E</div>
               <div>
@@ -96,13 +112,13 @@ function Aide() {
               <div className="text-center">
                 <h2 className="mb-1.5 text-base font-bold">{t.videoTitle}</h2>
                 <p className="mb-4 text-xs text-muted-foreground">{t.videoDesc}</p>
-                <video controls preload="metadata" src={video.url} className="mx-auto aspect-video w-full max-w-2xl rounded-xl bg-foreground" />
+                <SchoolVideo lang={lang} />
               </div>
             )}
             {(tab === "wilayas" || tab === "knowledge") && uid === null && (
               <div className="grid place-items-center py-16 text-center">
                 <p className="text-sm font-semibold">{t.login}</p>
-                <Link to="/" className="mt-3 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
+                <Link to="/" target={embed ? "_top" : undefined} className="mt-3 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
               </div>
             )}
             {tab === "wilayas" && uid && <Wilayas t={t} uid={uid} name={name} />}
@@ -112,6 +128,14 @@ function Aide() {
       </div>
     </main>
   );
+}
+
+function SchoolVideo({ lang }: { lang: Lang }) {
+  const [failed, setFailed] = useState(false);
+  const msg = { ar: "الفيديو غير متوفر حاليًا.", fr: "La vidéo est momentanément indisponible.", en: "The video is currently unavailable." }[lang];
+  if (failed)
+    return <div className="mx-auto grid aspect-video w-full max-w-2xl place-items-center rounded-xl border border-dashed border-border bg-muted text-sm text-muted-foreground">{msg}</div>;
+  return <video controls playsInline preload="metadata" src={video.url} onError={() => setFailed(true)} className="mx-auto aspect-video w-full max-w-2xl rounded-xl bg-muted" />;
 }
 
 type TT = (typeof T)[Lang];
@@ -191,7 +215,7 @@ function Wilayas({ t, uid, name }: { t: TT; uid: string; name: string }) {
 
 function Knowledge({ t, uid, name }: { t: TT; uid: string; name: string }) {
   const [files, setFiles] = useState<FileRow[]>([]);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -237,7 +261,7 @@ function Knowledge({ t, uid, name }: { t: TT; uid: string; name: string }) {
         <form onSubmit={submit} className="mb-4 flex flex-col gap-2 rounded-lg border border-border bg-card p-3">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={150} placeholder={t.fileTitle} className="rounded-md border border-border bg-background px-3 py-2 text-sm" />
           <label className="text-xs text-muted-foreground">{t.pickFile}
-            <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mt-1 block w-full text-xs" />
+            <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="mt-1 block w-full cursor-pointer rounded-md border border-dashed border-border bg-background p-3 text-xs file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-primary-foreground" />
           </label>
           <div className="flex gap-2">
             <button disabled={busy || !file || !title.trim()} className="rounded-md bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground disabled:opacity-50">{busy ? "…" : t.send}</button>
