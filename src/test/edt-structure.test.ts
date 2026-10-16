@@ -12,3 +12,7 @@ describe("ENSTP structure", () => {
     expect(sessionMatches("CP1", { sections: [] }, "3")).toBe(true);
   });
 });
+describe("DIB 3ème année order", () => {
+  it("maps groups 1-4 to salles 7, 8, 9, 25", () =>
+    expect(STRUCTURE["DIB1"]!.units.map((u) => u.value)).toEqual(["7", "8", "9", "25"]));
+});
