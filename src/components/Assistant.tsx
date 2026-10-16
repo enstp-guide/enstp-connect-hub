@@ -277,6 +277,12 @@ function ChatBody({
                     ) : (
                       <MessageResponse key={i}>{p.text}</MessageResponse>
                     );
+                  if (p.type === "tool-get_timetable")
+                    return p.state === "output-available" ? (
+                      <PdfCard key={i} o={p.output as { label: string; pdf: string; page: number }} />
+                    ) : p.state === "output-error" ? null : (
+                      <Shimmer key={i}>{UI_TEXT[lang].thinking}</Shimmer>
+                    );
                   if (p.type === "tool-propose_video")
                     return (
                       <Tool key={i} defaultOpen={false}>
@@ -415,6 +421,22 @@ function VideoCard({ v }: { v: { title: string; url: string; description: string
           {state === "ok" ? "✅ Ajoutée à la page « L’École »." : "Vidéo refusée."}
         </p>
       )}
+    </div>
+  );
+}
+
+function PdfCard({ o }: { o: { label: string; pdf: string; page: number } }) {
+  return (
+    <div className="mt-2 rounded-xl border border-border bg-muted/60 p-3">
+      <p className="text-xs font-semibold">📄 {o.label}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <a href={o.pdf} download className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
+          Télécharger le PDF
+        </a>
+        <a href={`${o.pdf}#page=${o.page}`} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold">
+          Voir (page {o.page})
+        </a>
+      </div>
     </div>
   );
 }
