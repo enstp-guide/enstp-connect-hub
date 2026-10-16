@@ -6,7 +6,6 @@ import { BackLink } from "@/components/BackLink";
 import { Assistant } from "@/components/LazyAssistant";
 import { DEPTS, ORG, WHO_TO_ASK } from "@/lib/enstp-data";
 import { Narrator } from "@/components/Narrator";
-import presentation from "@/assets/ecole-presentation.mp4.asset.json";
 
 export const Route = createFileRoute("/ecole")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -98,14 +97,6 @@ function Ecole() {
         </header>
 
         <section>
-          <video
-            src={presentation.url}
-            controls
-            playsInline
-            preload="none"
-            className="w-full rounded-2xl border border-border bg-muted"
-            aria-label="Présentation animée de l’ENSTP"
-          />
           <p className="mt-2 text-xs text-muted-foreground">
             Votre guide vous présente l’ENSTP : histoire, cursus et départements.
           </p>

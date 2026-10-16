@@ -29,6 +29,13 @@
       "when": 1792146299238,
       "tag": "0003_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792148628891,
+      "tag": "0004_wilaya_post_replies",
+      "breakpoints": true
     }
   ]
 }
