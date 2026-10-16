@@ -36,6 +36,13 @@
       "when": 1792148628891,
       "tag": "0004_wilaya_post_replies",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792150494408,
+      "tag": "0005_profile_specialty_all_years",
+      "breakpoints": true
     }
   ]
 }
