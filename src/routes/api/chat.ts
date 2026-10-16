@@ -6,7 +6,7 @@ import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { detectLanguage, LANG_NAME } from "@/lib/detect-language";
 import { SCHOOL_KNOWLEDGE, GROUPS } from "@/lib/enstp-data";
-import { STRUCTURE, STRUCTURE_TEXT, sessionMatches } from "@/lib/edt-structure";
+import { STRUCTURE, STRUCTURE_TEXT, normalizeSessions, sessionMatches } from "@/lib/edt-structure";
 import edt from "@/lib/edt-data.json";
 import {
   createLovableAiGatewayRunIdFetch,
@@ -94,13 +94,13 @@ export const Route = createFileRoute("/api/chat")({
               description: "Emploi du temps officiel d’une classe ENSTP (et éventuellement d’un groupe/section/salle), avec le lien du PDF officiel.",
               inputSchema: z.object({
                 group: z.enum(["CP1", "CP2", "DIB1", "DIB2", "DIB3", "DMS1", "DMS2", "DMS3"]),
-                unit: z.string().optional().describe("Valeur du groupe/section/salle, ex. '3', 'SEC 2', 'Section 01', '25'"),
+                unit: z.string().optional().describe("Valeur du groupe/section/salle, ex. '3' (groupe), 'SEC 2' (DMS 3ème), 'Section 01' (DMS 4ème), '1'..'4' (DIB 3ème, colonnes gauche→droite), '1'..'2' (DIB 4ème)"),
                 day: z.enum(["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"]).optional(),
               }),
               execute: async ({ group, unit, day }) => {
                 const g = GROUPS.find((x) => x.id === group)!;
                 const st = STRUCTURE[group]!;
-                const all = (edt as Record<string, { sessions: { day: string; start: string; end: string; subject: string; teacher: string; room: string; kind: string; sections: string[] }[] }>)[group]?.sessions ?? [];
+                const all = normalizeSessions(group, (edt as Record<string, { sessions: { day: string; start: string; end: string; subject: string; teacher: string; room: string; kind: string; sections: string[] }[] }>)[group]?.sessions ?? []);
                 const sessions = all
                   .filter((s) => (!day || s.day === day) && sessionMatches(group, s, unit ?? ""))
                   .map(({ day, start, end, subject, teacher, room, kind }) => ({ day, start, end, subject, teacher, room, kind }));

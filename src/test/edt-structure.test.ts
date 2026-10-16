@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { STRUCTURE, sessionMatches } from "@/lib/edt-structure";
+import { STRUCTURE, normalizeSessions, sessionMatches } from "@/lib/edt-structure";
 describe("ENSTP structure", () => {
   it("1ère année prépa has 10 groups", () => expect(STRUCTURE["CP1"]!.units).toHaveLength(10));
   it("2ème année prépa has 12 groups", () => expect(STRUCTURE["CP2"]!.units).toHaveLength(12));
@@ -12,7 +12,13 @@ describe("ENSTP structure", () => {
     expect(sessionMatches("CP1", { sections: [] }, "3")).toBe(true);
   });
 });
-describe("DIB 3ème année order", () => {
-  it("maps groups 1-4 to salles 7, 8, 9, 25", () =>
-    expect(STRUCTURE["DIB1"]!.units.map((u) => u.value)).toEqual(["7", "8", "9", "25"]));
+describe("DIB columns are groups left to right", () => {
+  it("assigns Sunday 8h rooms 7, 8, 9, 25 to groups 1-4", () => {
+    const rows = ["7", "8", "9", "25"].map((r) => ({ day: "Sunday", start: "08h00", sections: [r] }));
+    expect(normalizeSessions("DIB1", rows).map((s) => s.sections[0])).toEqual(["1", "2", "3", "4"]);
+  });
+  it("other rooms follow the same order (Tuesday 6, 7, 8, 9)", () => {
+    const rows = ["6", "7", "8", "9"].map((r) => ({ day: "Tuesday", start: "08h00", sections: [r] }));
+    expect(normalizeSessions("DIB1", rows).map((s) => s.sections[0])).toEqual(["1", "2", "3", "4"]);
+  });
 });
