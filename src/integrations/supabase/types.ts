@@ -14,7 +14,179 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      approved_videos: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: Json
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: Json
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: Json
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          academic_year: number | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          specialty: string | null
+          updated_at: string
+        }
+        Insert: {
+          academic_year?: number | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id: string
+          last_name?: string
+          specialty?: string | null
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: number | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          specialty?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shared_files: {
+        Row: {
+          author_name: string
+          created_at: string
+          file_type: string
+          id: string
+          path: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          created_at?: string
+          file_type?: string
+          id?: string
+          path: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          created_at?: string
+          file_type?: string
+          id?: string
+          path?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wilaya_posts: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+          wilaya_code: number
+        }
+        Insert: {
+          author_name?: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+          wilaya_code: number
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          wilaya_code?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
