@@ -1,13 +1,13 @@
 import { useState } from "react";
 import data from "@/lib/edt-data.json";
-import { STRUCTURE, sessionMatches } from "@/lib/edt-structure";
+import { STRUCTURE, normalizeSessions, sessionMatches } from "@/lib/edt-structure";
 
 type S = { day: string; start: string; end: string; subject: string; teacher: string; room: string; kind: string; sections: string[] };
 const DAYS: Record<string, string> = { Saturday: "Samedi", Sunday: "Dimanche", Monday: "Lundi", Tuesday: "Mardi", Wednesday: "Mercredi", Thursday: "Jeudi" };
 
 export function DetailedTimetable({ group }: { group: string }) {
   const g = (data as Record<string, { sessions: S[] }>)[group];
-  const sessions = g?.sessions ?? [];
+  const sessions = normalizeSessions(group, g?.sessions ?? []);
   const st = STRUCTURE[group];
   const days = Object.keys(DAYS).filter((d) => sessions.some((s) => s.day === d));
   const [sec, setSec] = useState("");
@@ -49,7 +49,7 @@ export function DetailedTimetable({ group }: { group: string }) {
                 {s.teacher && <p className="text-muted-foreground">{s.teacher}</p>}
                 <p className="mt-1 text-xs">
                   {s.room && <span className="mr-2 rounded bg-muted px-1.5 py-0.5 font-semibold">Salle {s.room}</span>}
-                  {s.sections.length > 0 && <span className="text-muted-foreground">{s.sections.length > 3 ? "Plusieurs groupes" : s.sections.join(", ")}</span>}
+                  {s.sections.length > 0 && <span className="text-muted-foreground">{s.sections.length > 3 ? "Plusieurs groupes" : s.sections.map((x) => (/^\d+$/.test(x) && st ? `${st.unitName} ${x}` : x)).join(", ")}</span>}
                 </p>
               </div>
             </li>
