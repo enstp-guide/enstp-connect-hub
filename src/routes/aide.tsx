@@ -34,7 +34,7 @@ const T = {
 
 const WILAYAS = ["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة","تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة","سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة","وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة","سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار","أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
 
-type Post = { id: string; user_id: string; author_name: string; wilaya_code: number; content: string; created_at: string };
+type Post = { id: string; user_id: string; author_name: string; wilaya_code: number; content: string; parent_id?: string | null; created_at: string };
 type FileRow = { id: string; user_id: string; author_name: string; title: string; path: string; file_type: string; created_at: string };
 
 function Aide() {
