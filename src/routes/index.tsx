@@ -213,35 +213,79 @@ function AuthFlow() {
 
   async function onSignUp(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setErr("");
+    setInfo("");
     const parsed = signUpSchema.safeParse({ firstName, lastName, email, password });
     if (!parsed.success) return setErr(parsed.error.issues[0]?.message ?? "Champs invalides");
     const d = parsed.data;
     setBusy(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: d.email.toLowerCase(),
-      password: d.password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { first_name: d.firstName, last_name: d.lastName },
-      },
-    });
-    if (!error && !data.session) {
-      await supabase.auth.signInWithPassword({ email: d.email.toLowerCase(), password: d.password });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: d.email.toLowerCase(),
+        password: d.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: { first_name: d.firstName, last_name: d.lastName },
+        },
+      });
+      if (error) {
+        console.error("[signup]", error);
+        return setErr(translate(error));
+      }
+      if (!data.session) {
+        setInfo(`Compte créé ! Un email de confirmation a été envoyé à ${d.email.toLowerCase()}. Cliquez sur le lien (vérifiez vos spams), puis connectez-vous.`);
+        setView("login");
+      }
+    } catch (ex) {
+      console.error("[signup] exception", ex);
+      setErr("Impossible de joindre le serveur. Vérifiez votre connexion internet.");
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
-    if (error) return setErr(translate(error.message));
+  }
+
+  async function resend() {
+    const em = email.trim().toLowerCase();
+    if (!em) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({ type: "signup", email: em, options: { emailRedirectTo: window.location.origin } });
+      if (error) {
+        console.error("[resend]", error);
+        setErr(translate(error));
+      } else {
+        setErr("");
+        setInfo("Email de confirmation renvoyé. Vérifiez votre boîte de réception et vos spams.");
+      }
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function onLogin(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setErr("");
+    setInfo("");
     const em = email.trim().toLowerCase();
     if (!z.string().email().safeParse(em).success) return setErr("Email invalide");
+    if (!password) return setErr("Entrez votre mot de passe.");
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: em, password });
-    setBusy(false);
-    if (error) return setErr(translate(error.message));
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email: em, password });
+      if (error) {
+        console.error("[login]", error.code, error.status, error.message);
+        setUnconfirmed(error.code === "email_not_confirmed");
+        return setErr(translate(error));
+      }
+      // Session is persisted automatically; the page switches to the guide via onAuthStateChange.
+    } catch (ex) {
+      console.error("[login] exception", ex);
+      setErr("Impossible de joindre le serveur. Vérifiez votre connexion internet.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function onForgot(e: FormEvent) {
