@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AideRouteImport } from './routes/aide'
 import { Route as EcoleRouteImport } from './routes/ecole'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SallesRouteImport } from './routes/salles'
@@ -18,6 +19,11 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AideRoute = AideRouteImport.update({
+  id: '/aide',
+  path: '/aide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EcoleRoute = EcoleRouteImport.update({
@@ -43,6 +49,7 @@ const ApiChatRoute = ApiChatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aide': typeof AideRoute
   '/ecole': typeof EcoleRoute
   '/reset-password': typeof ResetPasswordRoute
   '/salles': typeof SallesRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aide': typeof AideRoute
   '/ecole': typeof EcoleRoute
   '/reset-password': typeof ResetPasswordRoute
   '/salles': typeof SallesRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aide': typeof AideRoute
   '/ecole': typeof EcoleRoute
   '/reset-password': typeof ResetPasswordRoute
   '/salles': typeof SallesRoute
@@ -65,14 +74,23 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
+  fullPaths:
+    '/' | '/aide' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
-  id: '__root__' | '/' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
+  to: '/' | '/aide' | '/ecole' | '/reset-password' | '/salles' | '/api/chat'
+  id:
+    | '__root__'
+    | '/'
+    | '/aide'
+    | '/ecole'
+    | '/reset-password'
+    | '/salles'
+    | '/api/chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AideRoute: typeof AideRoute
   EcoleRoute: typeof EcoleRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SallesRoute: typeof SallesRoute
@@ -86,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aide': {
+      id: '/aide'
+      path: '/aide'
+      fullPath: '/aide'
+      preLoaderRoute: typeof AideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ecole': {
@@ -121,6 +146,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AideRoute: AideRoute,
   EcoleRoute: EcoleRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SallesRoute: SallesRoute,
