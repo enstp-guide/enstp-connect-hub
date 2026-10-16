@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/BackLink";
 import { Assistant } from "@/components/LazyAssistant";
 import { DEPTS, ORG, WHO_TO_ASK } from "@/lib/enstp-data";
-import { Narrator } from "@/components/Narrator";
+import presentation from "@/assets/ecole-mascotte.mp4.asset.json";
 
 export const Route = createFileRoute("/ecole")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -97,12 +97,10 @@ function Ecole() {
         </header>
 
         <section>
+          <video src={presentation.url} controls playsInline preload="metadata" className="aspect-video w-full rounded-2xl border border-border bg-muted" aria-label="Présentation animée de l’ENSTP" />
           <p className="mt-2 text-xs text-muted-foreground">
             Votre guide vous présente l’ENSTP : histoire, cursus et départements.
           </p>
-          <div className="mt-4">
-            <Narrator />
-          </div>
         </section>
 
         <section id="ecole-histoire">
