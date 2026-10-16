@@ -21,7 +21,16 @@ export const Route = createFileRoute("/compte")({
 const inputCls =
   "w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary";
 
+const L = {
+  fr: { t: "Mon compte", fn: "Prénom", ln: "Nom", em: "Email", yr: "Année d’étude", sp: "Spécialité", ch: "Choisir…", y: ["1ère année (Prépa)", "2ème année (Prépa)", "3ème année", "4ème année", "5ème année"], dib: "DIB – Infrastructures et Bâtiment", dms: "DMS – Matériaux et Structures", save: "Enregistrer", saving: "Enregistrement…" },
+  en: { t: "My Account", fn: "First name", ln: "Last name", em: "Email", yr: "Year of study", sp: "Specialty", ch: "Choose…", y: ["1st year (Prep)", "2nd year (Prep)", "3rd year", "4th year", "5th year"], dib: "DIB – Infrastructure & Building", dms: "DMS – Materials & Structures", save: "Save", saving: "Saving…" },
+  ar: { t: "حسابي", fn: "الاسم", ln: "اللقب", em: "البريد الإلكتروني", yr: "سنة الدراسة", sp: "التخصص", ch: "اختر…", y: ["السنة الأولى (تحضيري)", "السنة الثانية (تحضيري)", "السنة الثالثة", "السنة الرابعة", "السنة الخامسة"], dib: "DIB – المنشآت والبناء", dms: "DMS – المواد والهياكل", save: "حفظ", saving: "جارٍ الحفظ…" },
+};
+
 function Compte() {
+  const [lang, setLang] = useState<"fr" | "en" | "ar">("fr");
+  useEffect(() => { try { const v = localStorage.getItem("enstp-go-lang"); if (v === "en" || v === "ar") setLang(v); } catch { /* ignore */ } }, []);
+  const t = L[lang];
   const [uid, setUid] = useState<string | null | undefined>(undefined);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -90,44 +99,44 @@ function Compte() {
     );
 
   return (
-    <main className="min-h-screen bg-background px-4 pb-20 pt-8 text-foreground">
+    <main lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} className="min-h-screen bg-background px-4 pb-20 pt-8 text-foreground">
       <div className="mx-auto max-w-xl space-y-6">
         <BackLink />
         <header className="rounded-3xl bg-primary p-6 text-primary-foreground">
-          <p className="text-xs font-bold uppercase tracking-widest opacity-80">Mon compte</p>
+          <p className="text-xs font-bold uppercase tracking-widest opacity-80">{t.t}</p>
           <h1 className="mt-1 text-2xl font-extrabold">
             {displayName({ first_name: first, last_name: last, academic_year: year || null, specialty: spec || null }, "Étudiant")}
           </h1>
         </header>
         <form onSubmit={save} className="grid gap-4 rounded-2xl border border-border bg-card p-6" noValidate>
           <div className="grid grid-cols-2 gap-3">
-            <label className="grid gap-1.5 text-sm font-semibold">Prénom<input className={inputCls} value={first} maxLength={60} onChange={(e) => setFirst(e.target.value)} /></label>
-            <label className="grid gap-1.5 text-sm font-semibold">Nom<input className={inputCls} value={last} maxLength={60} onChange={(e) => setLast(e.target.value)} /></label>
+            <label className="grid gap-1.5 text-sm font-semibold">{t.fn}<input className={inputCls} value={first} maxLength={60} onChange={(e) => setFirst(e.target.value)} /></label>
+            <label className="grid gap-1.5 text-sm font-semibold">{t.ln}<input className={inputCls} value={last} maxLength={60} onChange={(e) => setLast(e.target.value)} /></label>
           </div>
-          <label className="grid gap-1.5 text-sm font-semibold">Email<input className={inputCls} type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+          <label className="grid gap-1.5 text-sm font-semibold">{t.em}<input className={inputCls} type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
           <div className="grid grid-cols-2 gap-3">
-            <label className="grid gap-1.5 text-sm font-semibold">Année d’étude
+            <label className="grid gap-1.5 text-sm font-semibold">{t.yr}
               <select className={inputCls} value={year} onChange={(e) => setYear(Number(e.target.value))}>
-                <option value={0}>Choisir…</option>
-                <option value={1}>1ère année (Prépa)</option>
-                <option value={2}>2ème année (Prépa)</option>
-                <option value={3}>3ème année</option>
-                <option value={4}>4ème année</option>
-                <option value={5}>5ème année</option>
+                <option value={0}>{t.ch}</option>
+                <option value={1}>{t.y[0]}</option>
+                <option value={2}>{t.y[1]}</option>
+                <option value={3}>{t.y[2]}</option>
+                <option value={4}>{t.y[3]}</option>
+                <option value={5}>{t.y[4]}</option>
               </select>
             </label>
             {year > 2 && (
-              <label className="grid gap-1.5 text-sm font-semibold">Spécialité
+              <label className="grid gap-1.5 text-sm font-semibold">{t.sp}
                 <select className={inputCls} value={spec} onChange={(e) => setSpec(e.target.value)}>
-                  <option value="">Choisir…</option>
-                  <option value="DIB">DIB – Infrastructures et Bâtiment</option>
-                  <option value="DMS">DMS – Matériaux et Structures</option>
+                  <option value="">{t.ch}</option>
+                  <option value="DIB">{t.dib}</option>
+                  <option value="DMS">{t.dms}</option>
                 </select>
               </label>
             )}
           </div>
           <button disabled={busy} className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">
-            {busy ? "Enregistrement…" : "Enregistrer"}
+            {busy ? t.saving : t.save}
           </button>
           {msg && <p role="status" className="text-sm font-medium text-primary">{msg}</p>}
         </form>
