@@ -52,7 +52,7 @@ function Aide() {
       if (!data.user) return;
       const { data: p } = await supabase.from("profiles").select("first_name,last_name").eq("id", data.user.id).maybeSingle();
       const full = p ? `${p.first_name} ${p.last_name}`.trim() : "";
-      setName(full || (data.user.email ?? "").split("@")[0] ?? "");
+      setName(full || ((data.user.email ?? "").split("@")[0] ?? ""));
     });
   }, []);
 
