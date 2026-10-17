@@ -18,5 +18,6 @@
 - [x] Further performance pass
 - [x] مجتمع ENSTP help center (/aide): video, 58 wilaya groups, file sharing, AR/FR/EN
 - [x] Sign-up year + conditional specialty; Compte page; name "Prénom Nom • Année Spécialité"; room-to-room itinerary
-- [ ] Detailed timetable data (courses, teachers, rooms) for assistant — needs official timetable files
+- [x] Detailed timetable data (courses, teachers, rooms) for assistant — needs official timetable files
+- [x] Sport photos from root public/ with clean icon fallback; residence section translated FR/EN/AR
 - [ ] Aide redesign (stats cards, 2-column recent files/discussions, pagination, skeletons)
