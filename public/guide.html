@@ -296,13 +296,13 @@ function spHtml(){var f=st.spf||'all',S=L2(SPL);return '<section class="detail-s
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-spf]');if(b){st.spf=b.getAttribute('data-spf');var sec=b.closest('.detail-section');sec.outerHTML=spHtml();}});
 
 var TCH=[['cp1',[['Analyse 1','Rima Narimane Bellal',['Maître de conférences — ENSTP','Doctorat en mathématiques et RO — USTHB (2013–2019)'],'r.bellal@enstp.edu.dz','rima-narimen-bellal-5b7855a0']]],
-['cp2',[['Analyse 3 / Chimie 3','Khaoula Dib',['Maître de Conférences A — ENSTP','Chercheuse — USTHB','Doctorat en chimie — USTHB (2013–2016)'],'k.dib@enstp.edu.dz','khaoula-dib-58886099'],
-['Analyse Numérique 2','Safia Bouhara',[],'s.bouhara@enstp.edu.dz','safia-bouhara-6278a0363'],
-['Physique 3','Sid Ahmed Berroudji',['Enseignant — ENSTP'],'s.berroudji@enstp.edu.dz','sidahmed-berroudji'],
+['cp2',[['Chimie 3','Khaoula Dib',['Maître de Conférences A — ENSTP','Chercheuse — USTHB','Doctorat en chimie — USTHB (2013–2016)'],'k.dib@enstp.edu.dz','khaoula-dib-58886099'],
+['Chimie 3','Safia Bouhara',[],'s.bouhara@enstp.edu.dz','safia-bouhara-6278a0363'],
+['Physique 3 & MDF','Sid Ahmed Berroudji',['Enseignant — ENSTP'],'s.berroudji@enstp.edu.dz','sidahmed-berroudji'],
 ['Informatique 3','Mohamed Oulad Kaddour',['Maître de conférences','Doctorat en informatique — ESI'],'m.ouladkaddour@enstp.edu.dz','oulad-kaddour-mohamed-41b76337'],
-['MDF (Mécanique des Fluides)','Adel Rahoui',['Maître de Conférences A — ENSTP & UMMTO','Doctorat en électrotechnique — USTHB (2017–2021)'],'a.rahoui@enstp.edu.dz','adel-rahoui'],
-['MDF (Mécanique des Fluides)','Hichem Nemouchi',['Vacataire — ENSTP (depuis 2021) & USTHB (depuis 2019)','Dispatcher national — Sonelgaz'],'h.nemouchi@enstp.edu.dz',''],
-['Anglais 3','Abbas Azzi',['Vacataire — ENSTP & USTHB'],'','abbas-azzi-23600b3b8']]]];
+['Électricité générale','Adel Rahoui',['Maître de Conférences A — ENSTP & UMMTO','Doctorat en électrotechnique — USTHB (2017–2021)'],'a.rahoui@enstp.edu.dz','adel-rahoui'],
+['Électricité générale','Hichem Nemouchi',['Vacataire — ENSTP (depuis 2021) & USTHB (depuis 2019)','Dispatcher national — Sonelgaz'],'h.nemouchi@enstp.edu.dz',''],
+['Anglais 3','Abbas Azzi',['Vacataire — ENSTP & USTHB','Sonelgaz'],'','abbas-azzi-23600b3b8']]]];
 var TCL={fr:{h:'Enseignants et modules · 2026–2027',cp1:'1ère année Prépa (1ACP)',cp2:'2ème année Prépa (2ACP)',all:'Tout'},en:{h:'Teachers and modules · 2026–2027',cp1:'1st year Prep (1ACP)',cp2:'2nd year Prep (2ACP)',all:'All'},ar:{h:'الأساتذة والمقاييس · 2026–2027',cp1:'السنة الأولى تحضيري (1ACP)',cp2:'السنة الثانية تحضيري (2ACP)',all:'الكل'}};
 function tchHtml(){var S=L2(TCL),f=st.tcf||'all';var tabs='<div class="xg-tabs">'+['all','cp1','cp2'].map(function(k){return '<button type="button" class="xg-tab'+(f===k?' on':'')+'" onclick="st.tcf=\''+k+'\';render()">'+esc(S[k])+'</button>';}).join('')+'</div>';
 var body=TCH.filter(function(g){return f==='all'||f===g[0];}).map(function(g){return '<h3 class="tc-y">'+esc(S[g[0]])+'</h3><div class="tc-grid">'+g[1].map(function(t){var ini=t[1].split(' ').map(function(w){return w[0];}).slice(0,2).join('');
