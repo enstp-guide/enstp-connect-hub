@@ -77,6 +77,35 @@ function Salles() {
             <img key={g.id} src={g.img} alt={`Emploi du temps ${g.label}`} className="w-full" loading="lazy" decoding="async" />
           </button>
         </section>
+
+        <section className="space-y-6">
+          <h2 className="text-2xl font-extrabold">Tous les emplois du temps officiels</h2>
+          {[
+            { t: "Classes préparatoires (1ACP · 2ACP)", ids: ["CP1", "CP2"] },
+            { t: "Département DIB (3ème · 4ème · 5ème année)", ids: ["DIB1", "DIB2", "DIB3"] },
+            { t: "Département DMS (3ème · 4ème · 5ème année)", ids: ["DMS1", "DMS2", "DMS3"] },
+          ].map((s) => (
+            <div key={s.t}>
+              <h3 className="mb-3 font-bold">{s.t}</h3>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {GROUPS.filter((x) => s.ids.includes(x.id)).map((x) => (
+                  <article key={x.id} className="overflow-hidden rounded-2xl border border-border bg-card">
+                    <button onClick={() => { setGroup(x.id); setFull(true); }} className="block aspect-[4/3] w-full overflow-hidden bg-muted" aria-label={`Agrandir ${x.label}`}>
+                      <img src={x.img} alt={`Emploi du temps ${x.label}`} className="h-full w-full object-cover object-top" loading="lazy" decoding="async" />
+                    </button>
+                    <div className="space-y-2 p-3">
+                      <p className="text-sm font-semibold">{x.label}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <a href={`${x.pdf}#page=${x.page}`} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold">Voir le PDF (p. {x.page})</a>
+                        <a href={x.pdf} download className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">Télécharger</a>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
         {full && (
           <div className="fixed inset-0 z-[60] flex flex-col bg-hero-shade/95" role="dialog" aria-modal="true">
             <div className="flex items-center justify-between gap-3 p-3">
