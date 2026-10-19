@@ -28,9 +28,9 @@ type Lang = "ar" | "fr" | "en";
 type Tab = "home" | "wilayas" | "knowledge";
 
 const T = {
-  ar: { brand: "فضاء طلبة ENSTP", replyBtn: "رد", replyPh: "اكتب ردك…", brandSub: "فضاء الطلبة حسب الولاية", navHome: "الرئيسية", navVideo: "🎬 فيديو تعريفي", navWilayas: "الولايات", navKnowledge: "فضاء المعارف", heroSchool: "المدرسة الوطنية العليا للأشغال العمومية", heroWelcome: "مرحبًا بك في الدعم والمساعدة", heroDesc: "مجموعات نقاش لطلبة ENSTP مصنّفة حسب الولاية، وفضاء لتبادل الملفات.", watchVideoBtn: "شاهد الفيديو التعريفي", exploreBtn: "تصفح الولايات", videoTitle: "تعرف على مدرسة ENSTP", videoDesc: "نبذة تاريخية، البرامج الأكاديمية، الهيكل التنظيمي ومعلومات الاتصال.", wilayasTitle: "مجموعات الولايات", wilayasDesc: "اختر ولايتك وتابع رسائل زملائك أو شارك استفسارك.", newPostBtn: "+ منشور جديد", shareFileBtn: "+ مشاركة ملف", knowledgeDesc: "دروس، ملخصات ومواضيع امتحانات يشاركها طلبة ENSTP.", wilaya: "الولاية", search: "ابحث عن ولاية…", noPosts: "لا توجد رسائل بعد. كن أول من يكتب!", write: "اكتب رسالتك…", publish: "نشر", back: "← كل الولايات", noFiles: "لا توجد ملفات بعد.", fileTitle: "عنوان الملف", pickFile: "اختر ملفًا (حتى 20 ميغابايت)", send: "مشاركة", cancel: "إلغاء", download: "تحميل", del: "حذف", login: "سجّل الدخول للمشاركة في المجتمع.", loginBtn: "تسجيل الدخول", chooseWilaya: "اختر الولاية" },
-  fr: { brand: "Communauté ENSTP", replyBtn: "Répondre", replyPh: "Votre réponse…", brandSub: "L’espace étudiant par wilaya", navHome: "Accueil", navVideo: "🎬 Vidéo", navWilayas: "Wilayas", navKnowledge: "Espace savoirs", heroSchool: "École Nationale Supérieure des Travaux Publics", heroWelcome: "Bienvenue au centre d’aide", heroDesc: "Des groupes de discussion d’étudiants ENSTP par wilaya et un espace de partage de fichiers.", watchVideoBtn: "Voir la vidéo", exploreBtn: "Parcourir les wilayas", videoTitle: "Découvrez l’ENSTP", videoDesc: "Histoire, programmes, organigramme et contact.", wilayasTitle: "Groupes par wilaya", wilayasDesc: "Choisissez votre wilaya, lisez les messages ou posez votre question.", newPostBtn: "+ Nouveau message", shareFileBtn: "+ Partager un fichier", knowledgeDesc: "Cours, résumés et sujets d’examen partagés par les étudiants.", wilaya: "Wilaya", search: "Rechercher une wilaya…", noPosts: "Aucun message. Soyez le premier !", write: "Votre message…", publish: "Publier", back: "← Toutes les wilayas", noFiles: "Aucun fichier pour l’instant.", fileTitle: "Titre du fichier", pickFile: "Choisir un fichier (20 Mo max)", send: "Partager", cancel: "Annuler", download: "Télécharger", del: "Supprimer", login: "Connectez-vous pour participer.", loginBtn: "Se connecter", chooseWilaya: "Choisir la wilaya" },
-  en: { brand: "ENSTP Community", replyBtn: "Reply", replyPh: "Your reply…", brandSub: "Student space by wilaya", navHome: "Home", navVideo: "🎬 Video", navWilayas: "Wilayas", navKnowledge: "Knowledge hub", heroSchool: "National Higher School of Public Works", heroWelcome: "Welcome to help & support", heroDesc: "ENSTP student discussion groups by wilaya and a file-sharing space.", watchVideoBtn: "Watch the video", exploreBtn: "Browse wilayas", videoTitle: "Discover ENSTP", videoDesc: "History, programs, org chart and contact.", wilayasTitle: "Wilaya groups", wilayasDesc: "Pick your wilaya to read classmates’ messages or ask a question.", newPostBtn: "+ New post", shareFileBtn: "+ Share a file", knowledgeDesc: "Courses, summaries and exam papers shared by students.", wilaya: "Wilaya", search: "Search a wilaya…", noPosts: "No messages yet. Be the first!", write: "Write your message…", publish: "Post", back: "← All wilayas", noFiles: "No files yet.", fileTitle: "File title", pickFile: "Choose a file (max 20 MB)", send: "Share", cancel: "Cancel", download: "Download", del: "Delete", login: "Sign in to join the community.", loginBtn: "Sign in", chooseWilaya: "Choose wilaya" },
+  ar: { brand: "فضاء طلبة ENSTP", statFiles: "ملفات مشتركة", statMsgs: "رسائل في الولايات", msgs: "رسالة", replyBtn: "رد", replyPh: "اكتب ردك…", brandSub: "فضاء الطلبة حسب الولاية", navHome: "الرئيسية", navVideo: "🎬 فيديو تعريفي", navWilayas: "الولايات", navKnowledge: "فضاء المعارف", heroSchool: "المدرسة الوطنية العليا للأشغال العمومية", heroWelcome: "مرحبًا بك في الدعم والمساعدة", heroDesc: "مجموعات نقاش لطلبة ENSTP مصنّفة حسب الولاية، وفضاء لتبادل الملفات.", watchVideoBtn: "شاهد الفيديو التعريفي", exploreBtn: "تصفح الولايات", videoTitle: "تعرف على مدرسة ENSTP", videoDesc: "نبذة تاريخية، البرامج الأكاديمية، الهيكل التنظيمي ومعلومات الاتصال.", wilayasTitle: "مجموعات الولايات", wilayasDesc: "اختر ولايتك وتابع رسائل زملائك أو شارك استفسارك.", newPostBtn: "+ منشور جديد", shareFileBtn: "+ مشاركة ملف", knowledgeDesc: "دروس، ملخصات ومواضيع امتحانات يشاركها طلبة ENSTP.", wilaya: "الولاية", search: "ابحث عن ولاية…", noPosts: "لا توجد رسائل بعد. كن أول من يكتب!", write: "اكتب رسالتك…", publish: "نشر", back: "← كل الولايات", noFiles: "لا توجد ملفات بعد.", fileTitle: "عنوان الملف", pickFile: "اختر ملفًا (حتى 20 ميغابايت)", send: "مشاركة", cancel: "إلغاء", download: "تحميل", del: "حذف", login: "سجّل الدخول للمشاركة في المجتمع.", loginBtn: "تسجيل الدخول", chooseWilaya: "اختر الولاية" },
+  fr: { brand: "Communauté ENSTP", statFiles: "fichiers partagés", statMsgs: "messages dans les wilayas", msgs: "messages", replyBtn: "Répondre", replyPh: "Votre réponse…", brandSub: "L’espace étudiant par wilaya", navHome: "Accueil", navVideo: "🎬 Vidéo", navWilayas: "Wilayas", navKnowledge: "Espace savoirs", heroSchool: "École Nationale Supérieure des Travaux Publics", heroWelcome: "Bienvenue au centre d’aide", heroDesc: "Des groupes de discussion d’étudiants ENSTP par wilaya et un espace de partage de fichiers.", watchVideoBtn: "Voir la vidéo", exploreBtn: "Parcourir les wilayas", videoTitle: "Découvrez l’ENSTP", videoDesc: "Histoire, programmes, organigramme et contact.", wilayasTitle: "Groupes par wilaya", wilayasDesc: "Choisissez votre wilaya, lisez les messages ou posez votre question.", newPostBtn: "+ Nouveau message", shareFileBtn: "+ Partager un fichier", knowledgeDesc: "Cours, résumés et sujets d’examen partagés par les étudiants.", wilaya: "Wilaya", search: "Rechercher une wilaya…", noPosts: "Aucun message. Soyez le premier !", write: "Votre message…", publish: "Publier", back: "← Toutes les wilayas", noFiles: "Aucun fichier pour l’instant.", fileTitle: "Titre du fichier", pickFile: "Choisir un fichier (20 Mo max)", send: "Partager", cancel: "Annuler", download: "Télécharger", del: "Supprimer", login: "Connectez-vous pour participer.", loginBtn: "Se connecter", chooseWilaya: "Choisir la wilaya" },
+  en: { brand: "ENSTP Community", statFiles: "shared files", statMsgs: "wilaya messages", msgs: "messages", replyBtn: "Reply", replyPh: "Your reply…", brandSub: "Student space by wilaya", navHome: "Home", navVideo: "🎬 Video", navWilayas: "Wilayas", navKnowledge: "Knowledge hub", heroSchool: "National Higher School of Public Works", heroWelcome: "Welcome to help & support", heroDesc: "ENSTP student discussion groups by wilaya and a file-sharing space.", watchVideoBtn: "Watch the video", exploreBtn: "Browse wilayas", videoTitle: "Discover ENSTP", videoDesc: "History, programs, org chart and contact.", wilayasTitle: "Wilaya groups", wilayasDesc: "Pick your wilaya to read classmates’ messages or ask a question.", newPostBtn: "+ New post", shareFileBtn: "+ Share a file", knowledgeDesc: "Courses, summaries and exam papers shared by students.", wilaya: "Wilaya", search: "Search a wilaya…", noPosts: "No messages yet. Be the first!", write: "Write your message…", publish: "Post", back: "← All wilayas", noFiles: "No files yet.", fileTitle: "File title", pickFile: "Choose a file (max 20 MB)", send: "Share", cancel: "Cancel", download: "Download", del: "Delete", login: "Sign in to join the community.", loginBtn: "Sign in", chooseWilaya: "Choose wilaya" },
 } as const;
 
 const WILAYAS = ["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة","تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة","سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة","وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة","سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار","أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
@@ -46,6 +46,19 @@ function Aide() {
   const [uid, setUid] = useState<string | null | undefined>(undefined);
   const [name, setName] = useState("");
   const t = T[lang];
+  const [stats, setStats] = useState<{ files: number; msgs: number; by: Record<number, number> }>({ files: 0, msgs: 0, by: {} });
+  useEffect(() => {
+    if (!uid) return;
+    (async () => {
+      const [f, w] = await Promise.all([
+        supabase.from("shared_files").select("id", { count: "exact", head: true }),
+        supabase.from("wilaya_posts").select("wilaya_code").limit(10000),
+      ]);
+      const by: Record<number, number> = {};
+      (w.data ?? []).forEach((r) => { by[r.wilaya_code] = (by[r.wilaya_code] ?? 0) + 1; });
+      setStats({ files: f.count ?? 0, msgs: (w.data ?? []).length, by });
+    })();
+  }, [uid, tab]);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -85,7 +98,7 @@ function Aide() {
             </div>
             <nav className="flex flex-wrap gap-1 rounded-full border border-border bg-card p-1">
               {tabs.map(([k, label]) => (
-                <button key={k} onClick={() => setTab(k)} className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${tab === k ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>{label}</button>
+                <button key={k} onClick={() => setTab(k)} className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${tab === k ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>{label}{uid && k !== "home" && <span className="ms-1.5 rounded-full bg-mint px-1.5 text-[10px] font-bold text-foreground">{k === "wilayas" ? stats.msgs : stats.files}</span>}</button>
               ))}
             </nav>
           </header>
@@ -100,6 +113,16 @@ function Aide() {
                   <button onClick={() => setTab("wilayas")} className="rounded-full bg-mint px-5 py-2.5 text-sm font-bold text-foreground transition-transform hover:scale-[1.03]">{t.exploreBtn}</button>
                   <button onClick={() => setTab("knowledge")} className="rounded-full border border-primary-foreground/40 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-primary-foreground/10">{t.navKnowledge}</button>
                 </div>
+                {uid && (
+                  <div className="mx-auto mt-8 grid max-w-md grid-cols-2 gap-3">
+                    {([[stats.files, t.statFiles, "knowledge"], [stats.msgs, t.statMsgs, "wilayas"]] as const).map(([n, l, k]) => (
+                      <button key={k} onClick={() => setTab(k)} className="rounded-2xl bg-primary-foreground/10 p-4 transition-colors hover:bg-primary-foreground/20">
+                        <div className="text-3xl font-extrabold">{n}</div>
+                        <div className="text-xs opacity-80">{l}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {(tab === "wilayas" || tab === "knowledge") && uid === null && (
@@ -108,7 +131,7 @@ function Aide() {
                 <Link to="/" target={embed ? "_top" : "_self"} className="mt-3 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
               </div>
             )}
-            {tab === "wilayas" && uid && <Wilayas t={t} uid={uid} name={name} />}
+            {tab === "wilayas" && uid && <Wilayas t={t} uid={uid} name={name} counts={stats.by} />}
             {tab === "knowledge" && uid && <Knowledge t={t} uid={uid} name={name} />}
           </div>
         </div>
@@ -122,7 +145,7 @@ type TT = (typeof T)[Lang];
 const fmt = (d: string) => new Date(d).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
 const code = (n: number) => String(n).padStart(2, "0");
 
-function Wilayas({ t, uid, name }: { t: TT; uid: string; name: string }) {
+function Wilayas({ t, uid, name, counts }: { t: TT; uid: string; name: string; counts: Record<number, number> }) {
   const [sel, setSel] = useState<number | null>(null);
   const [q, setQ] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
@@ -208,6 +231,7 @@ function Wilayas({ t, uid, name }: { t: TT; uid: string; name: string }) {
           <button key={w.c} onClick={() => setSel(w.c)} className="rounded-lg border border-border bg-card p-2.5 text-center transition-colors hover:border-primary">
             <div className="text-sm font-bold">{w.n}</div>
             <div className="text-[10px] text-muted-foreground">{t.wilaya} {code(w.c)}</div>
+            {(counts[w.c] ?? 0) > 0 && <div className="mt-1 inline-block rounded-full bg-mint px-2 text-[10px] font-bold text-foreground">{counts[w.c]} {t.msgs}</div>}
           </button>
         ))}
       </div>
