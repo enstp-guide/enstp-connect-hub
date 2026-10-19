@@ -15,6 +15,14 @@ html,body{background:var(--background)!important;color:var(--foreground)}
 /* the hero stays on a photo: keep its light accents */
 .hero{--mint:oklch(.86 .09 163);--primary-foreground:oklch(1 0 0);--primary:oklch(.43 .079 169)}
 .btn-hero{background:oklch(1 0 0)!important;color:oklch(.43 .079 169)!important}
+/* teacher directory cards hard-code forest green in the base page */
+.tc-y{color:var(--foreground)!important}
+.tc-card{border-color:var(--border)!important;background:color-mix(in oklab,var(--primary) 12%,transparent)!important;box-shadow:none!important}
+.tc-av{background:var(--primary)!important;color:var(--primary-foreground)!important}
+.tc-mod{color:var(--mint-ink)!important}
+.tc-tags span{background:var(--secondary)!important;color:var(--muted-foreground)!important}
+.tc-acts a{border-color:color-mix(in oklab,var(--primary) 40%,transparent)!important;background:color-mix(in oklab,var(--primary) 16%,transparent)!important;color:var(--mint-ink)!important}
+.tc-acts a:hover{background:var(--primary)!important;color:var(--primary-foreground)!important}
 *{transition:background-color .3s,color .3s,border-color .3s}`;
 
 /** The legacy guide page uses its own color variables; dark values are injected into it. */
