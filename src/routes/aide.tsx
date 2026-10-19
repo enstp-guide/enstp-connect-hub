@@ -231,7 +231,7 @@ function Wilayas({ t, uid, name, counts }: { t: TT; uid: string; name: string; c
           <button key={w.c} onClick={() => setSel(w.c)} className="rounded-lg border border-border bg-card p-2.5 text-center transition-colors hover:border-primary">
             <div className="text-sm font-bold">{w.n}</div>
             <div className="text-[10px] text-muted-foreground">{t.wilaya} {code(w.c)}</div>
-            {(counts[w.c] ?? 0) > 0 && <div className="mt-1 inline-block rounded-full bg-mint px-2 text-[10px] font-bold text-foreground">{counts[w.c]} {t.msgs}</div>}
+            <div className="mt-1 inline-block rounded-full bg-mint px-2 text-[10px] font-bold text-foreground">{counts[w.c] ?? 0} {t.msgs}</div>
           </button>
         ))}
       </div>
