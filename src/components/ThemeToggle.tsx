@@ -19,10 +19,11 @@ html,body{background:var(--background)!important;color:var(--foreground)}
 .tc-y{color:var(--foreground)!important}
 .tc-card{border-color:var(--border)!important;background:color-mix(in oklab,var(--primary) 12%,transparent)!important;box-shadow:none!important}
 .tc-av{background:var(--primary)!important;color:var(--primary-foreground)!important}
-.tc-mod{color:var(--mint-ink)!important}
-.tc-tags span{background:var(--secondary)!important;color:var(--muted-foreground)!important}
-.tc-acts a{border-color:color-mix(in oklab,var(--primary) 40%,transparent)!important;background:color-mix(in oklab,var(--primary) 16%,transparent)!important;color:var(--mint-ink)!important}
+.tc-mod{color:oklch(.9 .07 165)!important}
+.tc-tags span{background:var(--secondary)!important;color:var(--foreground)!important}
+.tc-acts a{border-color:color-mix(in oklab,var(--primary) 65%,transparent)!important;background:color-mix(in oklab,var(--primary) 24%,transparent)!important;color:oklch(.94 .06 165)!important}
 .tc-acts a:hover{background:var(--primary)!important;color:var(--primary-foreground)!important}
+.xg-tabs button{color:var(--foreground)!important}
 *{transition:background-color .3s,color .3s,border-color .3s}`;
 
 /** The legacy guide page uses its own color variables; dark values are injected into it. */
