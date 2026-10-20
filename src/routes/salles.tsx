@@ -155,7 +155,6 @@ function Salles() {
                 </li>
               ))}
             </ol>
-            <p className="mt-5 rounded-xl bg-muted p-3 text-xs text-muted-foreground">Itinéraires indicatifs — la carte interactive du campus arrive bientôt.</p>
           </div>
         </section>
       </div>
