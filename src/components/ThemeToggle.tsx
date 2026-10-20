@@ -24,7 +24,7 @@ html,body{background:var(--background)!important;color:var(--foreground)}
 .tc-acts a{border-color:color-mix(in oklab,var(--primary) 65%,transparent)!important;background:color-mix(in oklab,var(--primary) 24%,transparent)!important;color:oklch(.94 .06 165)!important}
 .tc-acts a:hover{background:var(--primary)!important;color:var(--primary-foreground)!important}
 .xg-tabs button{color:var(--foreground)!important}
-*{transition:background-color .3s,color .3s,border-color .3s}`;
+*{transition:background-color .45s cubic-bezier(.4,0,.2,1),color .45s cubic-bezier(.4,0,.2,1),border-color .45s cubic-bezier(.4,0,.2,1)}`;
 
 /** The legacy guide page uses its own color variables; dark values are injected into it. */
 function syncFrames(dark: boolean, root: Document = document) {
@@ -40,7 +40,12 @@ function syncFrames(dark: boolean, root: Document = document) {
           el.textContent = GUIDE_DARK_CSS;
           doc.head.appendChild(el);
         } else if (!dark && el) el.remove();
-      } else doc.documentElement.classList.toggle("dark", dark);
+      } else if (doc.documentElement.classList.contains("dark") !== dark) {
+        const h = doc.documentElement;
+        h.classList.add("theme-anim");
+        h.classList.toggle("dark", dark);
+        setTimeout(() => h.classList.remove("theme-anim"), 500);
+      }
       syncFrames(dark, doc);
     } catch {
       /* cross-origin frame */
@@ -72,7 +77,7 @@ export function ThemeToggle() {
     root.classList.toggle("dark", v);
     localStorage.setItem(KEY, v ? "dark" : "light");
     setDark(v);
-    setTimeout(() => root.classList.remove("theme-anim"), 350);
+    setTimeout(() => root.classList.remove("theme-anim"), 500);
   }
 
   if (embedded) return null;
