@@ -241,7 +241,7 @@ function header(r) {
   return '<header class="site-header"><div class="header-inner">' +
     '<a href="#/" class="brand"><span class="brand-symbol">' + ic('compass', 23) + '</span><span class="brand-name" dir="ltr">enstp<span class="brand-go">go</span><span class="brand-sub">' + esc(t.tagline) + '</span></span></a>' +
     '<nav class="desktop-nav" aria-label="Navigation"><a href="#/"' + (r.name === 'home' ? ' class="nav-active"' : '') + '>' + esc(t.navGuide) + '</a>' +
-    '<a href="#/ecole">L’École</a>' + '<a href="' + gl('aide') + '">مجتمع ENSTP</a>' + '<a href="' + gl('campus') + '">' + esc(t.navCampus) + '</a><a href="' + gl('vie-etudiante') + '">' + esc(t.navLife) + '</a>' +
+    '<a href="#/ecole">L’École</a>' + '<a href="' + gl('aide') + '">مجتمع ENSTP</a>' + '<a href="' + gl('campus') + '">' + esc(t.navCampus) + '</a><a href="' + gl('vie-etudiante') + '">' + esc(t.navLife) + '</a><a href="' + gl('transport') + '">ENSTP Travel</a>' +
     '<a href="' + gl('alger') + '">' + esc(t.navAlger) + ' ' + ic('arrow-up-right', 14) + '</a></nav>' +
     '<div class="header-actions"><div class="lang-switch" role="group" aria-label="' + esc(t.language) + '">' + langs + '</div>' + '<a class="account-btn" href="#/compte">' + ic('user', 16) + '<span>' + (lang==='ar'?'حسابي':lang==='en'?'My Account':'Mon compte') + '</span></a>' +
     '<div class="header-tools"><button type="button" class="btn btn-ghost btn-icon" aria-label="' + esc(t.search) + '" data-search="1">' + ic('search', 20) + '</button>' +
