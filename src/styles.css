@@ -66,6 +66,7 @@
 :root {
   --radius: 0.625rem;
   --accent-warm: oklch(.7 .16 60);
+  --on-gradient: oklch(.99 0 0);
   --gradient-community: radial-gradient(120% 140% at 0% 0%, oklch(.5 .07 120) 0%, transparent 55%), linear-gradient(135deg, oklch(.42 .07 175), oklch(.36 .06 172));
   --mint: oklch(.93 .038 163);
   --hero-shade: oklch(.17 .025 170);
@@ -105,6 +106,7 @@
 
 .dark {
   --accent-warm: oklch(.72 .15 62);
+  --on-gradient: oklch(.97 .01 160);
   --gradient-community: radial-gradient(120% 140% at 0% 0%, oklch(.36 .06 120) 0%, transparent 55%), linear-gradient(135deg, oklch(.3 .05 175), oklch(.24 .04 172));
   --mint: oklch(.32 .05 165);
   --hero-shade: oklch(.12 .02 170);
