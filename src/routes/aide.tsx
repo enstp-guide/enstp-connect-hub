@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/BackLink";
+import { containsProfanity, PROFANITY_MSG } from "@/lib/profanity";
+const badMsg = (t: { brand: string }) => PROFANITY_MSG[t.brand === "ENSTP Community" ? "en" : t.brand === "Communauté ENSTP" ? "fr" : "ar"];
 
 export const Route = createFileRoute("/aide")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -163,6 +165,7 @@ function Wilayas({ t, uid, name, counts }: { t: TT; uid: string; name: string; c
     e.preventDefault();
     const c = text.trim();
     if (!c || !sel) return;
+    if (containsProfanity(c)) { toast.error(badMsg(t)); return; }
     setBusy(true);
     const { data, error } = await supabase.from("wilaya_posts").insert({ user_id: uid, author_name: name, wilaya_code: sel, content: c.slice(0, 1000) }).select().single();
     setBusy(false);
@@ -177,6 +180,7 @@ function Wilayas({ t, uid, name, counts }: { t: TT; uid: string; name: string; c
   async function sendReply(parent: string) {
     const c = replyText.trim();
     if (!c || !sel) return;
+    if (containsProfanity(c)) { toast.error(badMsg(t)); return; }
     setBusy(true);
     const { data, error } = await supabase.from("wilaya_posts").insert({ user_id: uid, author_name: name, wilaya_code: sel, content: c.slice(0, 1000), parent_id: parent }).select().single();
     setBusy(false);
@@ -253,6 +257,7 @@ function Knowledge({ t, uid, name }: { t: TT; uid: string; name: string }) {
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!file || !title.trim()) return;
+    if (containsProfanity(title) || containsProfanity(file.name)) { toast.error(badMsg(t)); return; }
     if (file.size > 20 * 1024 * 1024) { toast.error("20 MB max"); return; }
     setBusy(true);
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -266,9 +271,18 @@ function Knowledge({ t, uid, name }: { t: TT; uid: string; name: string }) {
     setTitle(""); setFile(null); setOpen(false);
   }
   async function download(f: FileRow) {
-    const { data, error } = await supabase.storage.from("knowledge").createSignedUrl(f.path, 120);
-    if (error) { toast.error(error.message); return; }
-    window.open(data.signedUrl, "_blank", "noopener");
+    const { data, error } = await supabase.storage.from("knowledge").download(f.path);
+    if (error || !data) { toast.error(error?.message ?? "Download failed"); return; }
+    const ext = f.path.split(".").pop();
+    const safe = f.title.replace(/[\\/:*?"<>|]+/g, "_").slice(0, 100) || "fichier";
+    const url = URL.createObjectURL(data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = ext && !safe.toLowerCase().endsWith("." + ext) ? `${safe}.${ext}` : safe;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   }
   async function remove(f: FileRow) {
     await supabase.storage.from("knowledge").remove([f.path]);

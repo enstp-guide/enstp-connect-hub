@@ -7,6 +7,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { detectLanguage, LANG_NAME } from "@/lib/detect-language";
 import { SCHOOL_KNOWLEDGE, GROUPS } from "@/lib/enstp-data";
 import { STRUCTURE, STRUCTURE_TEXT, normalizeSessions, sessionMatches } from "@/lib/edt-structure";
+import { GUIDE_KB } from "@/lib/guide-kb";
 import edt from "@/lib/edt-data.json";
 import {
   createLovableAiGatewayRunIdFetch,
@@ -24,7 +25,9 @@ Emplois du temps : utilise l’outil get_timetable avec la classe exacte (CP1, C
 Structure des classes :
 ${STRUCTURE_TEXT}
 Données de l’école :
-${SCHOOL_KNOWLEDGE}`;
+${SCHOOL_KNOWLEDGE}
+Contenu complet du guide du site (campus, salles, démarches, enseignants, bibliothèque, vie étudiante, résidence Garidi, clubs, sport, Alger, transports…). Appuie-toi dessus pour répondre à toute question sur le site, et indique la section du guide concernée :
+${GUIDE_KB}`;
 
 export const Route = createFileRoute("/api/chat")({
   server: {
