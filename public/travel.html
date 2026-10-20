@@ -503,7 +503,7 @@ if(b.classList.contains('tv-star')){var v=inp.value.trim();if(!v){inp.focus();re
 form.addEventListener('submit',function(){var v=inp.value.trim();if(!v||!email)return;var o=get();o.rec=[v].concat(o.rec.filter(function(x){return x!==v})).slice(0,5);put(o);setTimeout(draw,0);});
 draw();
 // resize for parent
-function h(){try{parent.postMessage({type:'enstp-travel-height',h:document.documentElement.scrollHeight},location.origin)}catch(e){}}
+function h(){try{parent.postMessage({type:'enstp-travel-height',height:document.documentElement.scrollHeight},location.origin)}catch(e){}}
 if(document.documentElement.classList.contains('embed')){new ResizeObserver(h).observe(document.body);h();}
 })();
 </script>
