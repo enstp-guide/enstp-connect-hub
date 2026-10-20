@@ -143,7 +143,7 @@ function Home({ t, uid, name, stats, go, lang }: { t: TT; uid: string | null | u
         <p className="mb-7 max-w-2xl text-sm opacity-90">{t.heroDesc}</p>
         <div className="flex flex-wrap gap-3">
           <button onClick={() => go("wilayas")} className="rounded-full bg-[color:var(--accent-warm)] px-6 py-2.5 text-sm font-bold text-[color:var(--on-gradient)] shadow transition-transform hover:scale-[1.02]">{t.exploreBtn}</button>
-          <button onClick={() => go("knowledge")} className="rounded-full border border-current/40 px-6 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10">{t.navKnowledge}</button>
+          <button onClick={() => go("knowledge")} className="rounded-full border border-current/40 px-6 py-2.5 text-sm font-semibold transition-colors hover:bg-[color:var(--on-gradient)]/10">{t.navKnowledge}</button>
         </div>
       </section>
       {uid && (
