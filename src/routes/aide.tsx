@@ -36,7 +36,7 @@ const T = {
 } as const;
 
 const WILAYAS_LAT = ["Adrar","Chlef","Laghouat","Oum El Bouaghi","Batna","Béjaïa","Biskra","Béchar","Blida","Bouira","Tamanrasset","Tébessa","Tlemcen","Tiaret","Tizi Ouzou","Alger","Djelfa","Jijel","Sétif","Saïda","Skikda","Sidi Bel Abbès","Annaba","Guelma","Constantine","Médéa","Mostaganem","M'Sila","Mascara","Ouargla","Oran","El Bayadh","Illizi","Bordj Bou Arréridj","Boumerdès","El Tarf","Tindouf","Tissemsilt","El Oued","Khenchela","Souk Ahras","Tipaza","Mila","Aïn Defla","Naâma","Aïn Témouchent","Ghardaïa","Relizane","Timimoun","Bordj Badji Mokhtar","Ouled Djellal","Béni Abbès","In Salah","In Guezzam","Touggourt","Djanet","El M'Ghair","El Meniaa"];
-const wName = (c: number, lang: string) => lang === "ar" ? WILAYAS[c - 1] : WILAYAS_LAT[c - 1];
+const wName = (c: number, lang: string): string => (lang === "ar" ? WILAYAS[c - 1] : WILAYAS_LAT[c - 1]) ?? "";
 const WILAYAS = ["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة","تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة","سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة","وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة","سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار","أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
 
 type Post = { id: string; user_id: string; author_name: string; wilaya_code: number; content: string; parent_id?: string | null; category?: string; created_at: string };
@@ -299,7 +299,7 @@ function Wilayas({ t, uid, name, counts, lang }: { t: TT; uid: string; name: str
     );
   }
 
-  const list = WILAYAS.map((_, i) => ({ n: wName(i + 1, lang), c: i + 1 })).filter((w) => w.n.toLowerCase().includes(q.toLowerCase()) || WILAYAS[w.c - 1].includes(q) || code(w.c).includes(q));
+  const list = WILAYAS.map((_, i) => ({ n: wName(i + 1, lang), c: i + 1 })).filter((w) => w.n.toLowerCase().includes(q.toLowerCase()) || (WILAYAS[w.c - 1] ?? "").includes(q) || code(w.c).includes(q));
   return (
     <div>
       <h2 className="text-3xl font-extrabold">{t.wilayasTitle}</h2>
