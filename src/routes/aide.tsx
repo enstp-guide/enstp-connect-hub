@@ -35,6 +35,8 @@ const T = {
   en: { brand: "ENSTP Community", statFiles: "shared files", statMsgs: "wilaya messages", msgs: "messages", replyBtn: "Reply", replyPh: "Your reply…", brandSub: "Student space by wilaya", navHome: "Home", navVideo: "🎬 Video", navWilayas: "Wilayas", navKnowledge: "Knowledge hub", heroSchool: "National Higher School of Public Works", heroWelcome: "Welcome to help & support", heroDesc: "ENSTP student discussion groups by wilaya and a file-sharing space.", watchVideoBtn: "Watch the video", exploreBtn: "Browse wilayas", videoTitle: "Discover ENSTP", videoDesc: "History, programs, org chart and contact.", wilayasTitle: "Wilaya groups", wilayasDesc: "Pick your wilaya to read classmates’ messages or ask a question.", newPostBtn: "+ New post", shareFileBtn: "+ Share a file", knowledgeDesc: "Courses, summaries and exam papers shared by students.", wilaya: "Wilaya", search: "Search a wilaya…", noPosts: "No messages yet. Be the first!", write: "Write your message…", publish: "Post", back: "← All wilayas", noFiles: "No files yet.", fileTitle: "File title", pickFile: "Choose a file (max 20 MB)", send: "Share", cancel: "Cancel", download: "Download", del: "Delete", login: "Sign in to join the community.", loginBtn: "Sign in", chooseWilaya: "Choose wilaya" },
 } as const;
 
+const WILAYAS_LAT = ["Adrar","Chlef","Laghouat","Oum El Bouaghi","Batna","Béjaïa","Biskra","Béchar","Blida","Bouira","Tamanrasset","Tébessa","Tlemcen","Tiaret","Tizi Ouzou","Alger","Djelfa","Jijel","Sétif","Saïda","Skikda","Sidi Bel Abbès","Annaba","Guelma","Constantine","Médéa","Mostaganem","M'Sila","Mascara","Ouargla","Oran","El Bayadh","Illizi","Bordj Bou Arréridj","Boumerdès","El Tarf","Tindouf","Tissemsilt","El Oued","Khenchela","Souk Ahras","Tipaza","Mila","Aïn Defla","Naâma","Aïn Témouchent","Ghardaïa","Relizane","Timimoun","Bordj Badji Mokhtar","Ouled Djellal","Béni Abbès","In Salah","In Guezzam","Touggourt","Djanet","El M'Ghair","El Meniaa"];
+const wName = (c: number, lang: string): string => (lang === "ar" ? WILAYAS[c - 1] : WILAYAS_LAT[c - 1]) ?? "";
 const WILAYAS = ["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة","تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة","سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة","وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة","سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار","أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
 
 type Post = { id: string; user_id: string; author_name: string; wilaya_code: number; content: string; parent_id?: string | null; category?: string; created_at: string };
@@ -135,13 +137,13 @@ function Home({ t, uid, name, stats, go, lang }: { t: TT; uid: string | null | u
   const st: [number, string, string, boolean][] = [[stats.msgs, L3(lang, "Messages des étudiants", "Student posts", "منشورات الطلبة"), IC.msg, false], [stats.files, L3(lang, "Fichiers partagés", "Shared files", "ملفات متبادلة"), IC.file, true], [active, L3(lang, "Wilayas actives", "Active wilayas", "ولايات نشطة"), IC.pin, false], [posts.length, L3(lang, "Discussions récentes", "Recent discussions", "نقاشات حديثة"), IC.msg, false]];
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl bg-[image:var(--gradient-community)] px-6 py-10 text-primary-foreground shadow-lg md:px-10 md:py-12">
+      <section className="relative overflow-hidden rounded-3xl bg-[image:var(--gradient-community)] px-6 py-10 shadow-lg md:px-10 md:py-12" style={{ color: "var(--on-gradient)" }}>
         <p className="mb-3 text-xs font-medium opacity-80">{t.heroSchool}</p>
         <h2 className="mb-3 text-3xl font-extrabold md:text-4xl">{L3(lang, "Bienvenue", "Welcome", "مرحبًا")}{name ? ` ${name.split(" •")[0]}` : ""}</h2>
         <p className="mb-7 max-w-2xl text-sm opacity-90">{t.heroDesc}</p>
         <div className="flex flex-wrap gap-3">
-          <button onClick={() => go("wilayas")} className="rounded-full bg-[color:var(--accent-warm)] px-6 py-2.5 text-sm font-bold text-primary-foreground shadow transition-transform hover:scale-[1.02]">{t.exploreBtn}</button>
-          <button onClick={() => go("knowledge")} className="rounded-full border border-primary-foreground/40 px-6 py-2.5 text-sm font-semibold transition-colors hover:bg-primary-foreground/10">{t.navKnowledge}</button>
+          <button onClick={() => go("wilayas")} className="rounded-full bg-[color:var(--accent-warm)] px-6 py-2.5 text-sm font-bold text-[color:var(--on-gradient)] shadow transition-transform hover:scale-[1.02]">{t.exploreBtn}</button>
+          <button onClick={() => go("knowledge")} className="rounded-full border border-current/40 px-6 py-2.5 text-sm font-semibold transition-colors hover:bg-[color:var(--on-gradient)]/10">{t.navKnowledge}</button>
         </div>
       </section>
       {uid && (
@@ -162,7 +164,7 @@ function Home({ t, uid, name, stats, go, lang }: { t: TT; uid: string | null | u
               ) : (
                 <div className="space-y-3">{posts.map((p) => (
                   <button key={p.id} onClick={() => go("wilayas")} className={`${card} block w-full p-4 text-start hover:border-primary/40`}>
-                    <div className="mb-1 flex justify-between gap-2 text-xs text-muted-foreground"><span className="font-semibold text-foreground">{p.author_name}</span><span>{WILAYAS[p.wilaya_code - 1]}</span></div>
+                    <div className="mb-1 flex justify-between gap-2 text-xs text-muted-foreground"><span className="font-semibold text-foreground">{p.author_name}</span><span>{wName(p.wilaya_code, lang)}</span></div>
                     <p className="line-clamp-2 text-sm">{p.content}</p>
                   </button>))}</div>
               )}
@@ -248,7 +250,7 @@ function Wilayas({ t, uid, name, counts, lang }: { t: TT; uid: string; name: str
   const initials = (n: string) => (n || "?").split(" ").map((x) => x[0]).join("").slice(0, 2).toUpperCase();
 
   if (sel) {
-    const wn = WILAYAS[sel - 1];
+    const wn = wName(sel, lang);
     return (
       <div className="mx-auto max-w-5xl">
         <button onClick={() => setSel(null)} className="mb-6 text-sm text-muted-foreground hover:text-foreground">{t.back}</button>
@@ -297,7 +299,7 @@ function Wilayas({ t, uid, name, counts, lang }: { t: TT; uid: string; name: str
     );
   }
 
-  const list = WILAYAS.map((n, i) => ({ n, c: i + 1 })).filter((w) => w.n.includes(q) || code(w.c).includes(q));
+  const list = WILAYAS.map((_, i) => ({ n: wName(i + 1, lang), c: i + 1 })).filter((w) => w.n.toLowerCase().includes(q.toLowerCase()) || (WILAYAS[w.c - 1] ?? "").includes(q) || code(w.c).includes(q));
   return (
     <div>
       <h2 className="text-3xl font-extrabold">{t.wilayasTitle}</h2>
