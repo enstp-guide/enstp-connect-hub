@@ -65,6 +65,8 @@
 
 :root {
   --radius: 0.625rem;
+  --accent-warm: oklch(.7 .16 60);
+  --gradient-community: radial-gradient(120% 140% at 0% 0%, oklch(.5 .07 120) 0%, transparent 55%), linear-gradient(135deg, oklch(.42 .07 175), oklch(.36 .06 172));
   --mint: oklch(.93 .038 163);
   --hero-shade: oklch(.17 .025 170);
   --background: oklch(.989 .003 155);
@@ -102,6 +104,8 @@
 }
 
 .dark {
+  --accent-warm: oklch(.72 .15 62);
+  --gradient-community: radial-gradient(120% 140% at 0% 0%, oklch(.36 .06 120) 0%, transparent 55%), linear-gradient(135deg, oklch(.3 .05 175), oklch(.24 .04 172));
   --mint: oklch(.32 .05 165);
   --hero-shade: oklch(.12 .02 170);
   --background: oklch(.17 .018 170);
@@ -133,7 +137,7 @@
   --sidebar-ring: oklch(.74 .11 165);
 }
 
-html.theme-anim, html.theme-anim * { transition: background-color .3s, color .3s, border-color .3s !important; }
+html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after { transition: background-color .45s cubic-bezier(.4,0,.2,1), color .45s cubic-bezier(.4,0,.2,1), border-color .45s cubic-bezier(.4,0,.2,1), fill .45s, stroke .45s, box-shadow .45s !important; }
 
 @layer base {
   * {
