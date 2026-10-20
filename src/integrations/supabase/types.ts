@@ -137,6 +137,7 @@ export type Database = {
           file_type: string
           id: string
           path: string
+          subject: string
           title: string
           user_id: string
         }
@@ -146,6 +147,7 @@ export type Database = {
           file_type?: string
           id?: string
           path: string
+          subject?: string
           title: string
           user_id: string
         }
@@ -155,6 +157,7 @@ export type Database = {
           file_type?: string
           id?: string
           path?: string
+          subject?: string
           title?: string
           user_id?: string
         }
@@ -163,6 +166,7 @@ export type Database = {
       wilaya_posts: {
         Row: {
           author_name: string
+          category: string
           content: string
           created_at: string
           id: string
@@ -172,6 +176,7 @@ export type Database = {
         }
         Insert: {
           author_name?: string
+          category?: string
           content: string
           created_at?: string
           id?: string
@@ -181,6 +186,7 @@ export type Database = {
         }
         Update: {
           author_name?: string
+          category?: string
           content?: string
           created_at?: string
           id?: string

@@ -43,6 +43,13 @@
       "when": 1792150494408,
       "tag": "0005_profile_specialty_all_years",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792537920022,
+      "tag": "0006_community_categories",
+      "breakpoints": true
     }
   ]
 }
