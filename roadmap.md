@@ -20,4 +20,5 @@
 - [x] Sign-up year + conditional specialty; Compte page; name "Prénom Nom • Année Spécialité"; room-to-room itinerary
 - [x] Detailed timetable data (courses, teachers, rooms) for assistant — needs official timetable files
 - [x] Sport photos from root public/ with clean icon fallback; residence section translated FR/EN/AR
-- [ ] Aide redesign (stats cards, 2-column recent files/discussions, pagination, skeletons)
+- [x] Aide redesign (stats cards, 2-column recent files/discussions, pagination, skeletons)
+- [x] Static guide package for GitHub Pages (guide + travel + photos; école/communauté served by the live app)
