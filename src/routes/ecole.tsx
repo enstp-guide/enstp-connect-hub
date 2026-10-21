@@ -61,11 +61,16 @@ function Ecole() {
   useEffect(() => {
     const element = content.current;
     if (!embed || !element) return;
-    const report = () =>
+    // Height messages must reach the parent page even when the guide is hosted
+    // on another origin (e.g. GitHub Pages): target the embedder's origin.
+    const report = () => {
+      let target = window.location.origin;
+      try { const r = new URL(document.referrer, window.location.href); if (r.origin && r.origin !== "null") target = r.origin; } catch {}
       window.parent.postMessage(
         { type: "enstp-ecole-height", height: Math.ceil(element.getBoundingClientRect().height) },
-        window.location.origin,
+        target,
       );
+    };
     const observer = new ResizeObserver(report);
     observer.observe(element);
     report();

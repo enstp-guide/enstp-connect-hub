@@ -76,7 +76,13 @@ function Aide() {
   useEffect(() => {
     const el = root.current;
     if (!embed || !el) return;
-    const report = () => window.parent.postMessage({ type: "enstp-aide-height", height: Math.ceil(el.getBoundingClientRect().height) }, window.location.origin);
+    // Height messages must reach the parent page even when the guide is hosted
+    // on another origin (e.g. GitHub Pages): target the embedder's origin.
+    const report = () => {
+      let target = window.location.origin;
+      try { const r = new URL(document.referrer, window.location.href); if (r.origin && r.origin !== "null") target = r.origin; } catch {}
+      window.parent.postMessage({ type: "enstp-aide-height", height: Math.ceil(el.getBoundingClientRect().height) }, target);
+    };
     const ob = new ResizeObserver(report);
     ob.observe(el);
     report();
