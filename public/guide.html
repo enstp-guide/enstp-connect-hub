@@ -376,7 +376,32 @@ var TCH=[['cp1',[['Analyse 1','Rima Narimane Bellal',['Maître de conférences �
 ['Informatique 3','Mohamed Oulad Kaddour',['Maître de conférences','Doctorat en informatique — ESI'],'m.ouladkaddour@enstp.edu.dz','oulad-kaddour-mohamed-41b76337'],
 ['Électricité générale','Adel Rahoui',['Maître de Conférences A — ENSTP & UMMTO','Doctorat en électrotechnique — USTHB (2017–2021)'],'a.rahoui@enstp.edu.dz','adel-rahoui'],
 ['Électricité générale','Hichem Nemouchi',['Vacataire — ENSTP (depuis 2021) & USTHB (depuis 2019)','Dispatcher national — Sonelgaz'],'h.nemouchi@enstp.edu.dz',''],
-['Anglais 3','Abbas Azzi',['Vacataire — ENSTP & USTHB','Sonelgaz'],'','abbas-azzi-23600b3b8']]]];
+['Anglais 3','Abbas Azzi',['Vacataire — ENSTP & USTHB','Sonelgaz'],'','abbas-azzi-23600b3b8'],["Analyse 3","Mr Brahmi",[],"a.brahmi@enstp.edu.dz",''],
+["Analyse 3","Mme Dehimi",[],"s.dhimi@enstp.edu.dz",''],
+["Analyse 3","Mr Benahmed",[],"moh.benahmed@enstp.edu.dz",''],
+["Analyse Numérique 2","Mr Hamadi",[],"a.hamadi@enstp.edu.dz",''],
+["Analyse Numérique 2","Mme Kiouche",[],"s.kiouche@enstp.edu.dz",''],
+["Chimie 3","Mr Bendada",[],"k.bendada@enstp.edu.dz",''],
+["Chimie 3","Mr Haouchine",[],"a.haouchine@enstp.edu.dz",''],
+["Physique 3","Mme Toumi",[],"o.toumi@enstp.edu.dz",''],
+["Physique 3","Mr Kellou",[],"h.kellou@enstp.edu.dz",''],
+["Physique 3","Mlle Kias",[],"f.kias@enstp.edu.dz",''],
+["Physique 3","Mlle Delladji",[],"",''],
+["Info 3","Mr Lhaddad",[],"s.lhaddad@enstp.edu.dz",''],
+["Info 3","Mlle Larbi",[],"",''],
+["MDF","Mlle Saadi",[],"",''],
+["MDF","Mme Meddah",[],"h.meddah@enstp.edu.dz",''],
+["Electricité Gle","Mr Tinouche",[],"",''],
+["Electricité Gle","Mr Benyettou",[],"f.benyettou@enstp.edu.dz",''],
+["Electricité Gle","Mlle Boudina",[],"",''],
+["Electricité Gle","Mlle Bouzid",[],"",''],
+["Meca Rationnelle 1","Mme Zouadi",[],"n.zouadi@enstp.edu.dz",''],
+["Meca Rationnelle 1","Mr Assas Taqiyeddine",[],"t.assas@enstp.edu.dz",''],
+["Meca Rationnelle 1","Mr Mezrag",[],"a.mezrag@enstp.edu.dz",''],
+["Ingénierie 1","Mme Chiali",[],"",''],
+["Anglais 3","Mr Yala",[],"a.yala@enstp.edu.dz",''],
+["Anglais 3","Mr Omar",[],"",''],
+["Technique d’expression","Mr Benyettou",[],"f.benyettou@enstp.edu.dz",'']]]];
 var TCL={fr:{h:'Enseignants et modules · 2026–2027',cp1:'1ère année Prépa (1ACP)',cp2:'2ème année Prépa (2ACP)',all:'Tout'},en:{h:'Teachers and modules · 2026–2027',cp1:'1st year Prep (1ACP)',cp2:'2nd year Prep (2ACP)',all:'All'},ar:{h:'الأساتذة والمقاييس · 2026–2027',cp1:'السنة الأولى تحضيري (1ACP)',cp2:'السنة الثانية تحضيري (2ACP)',all:'الكل'}};
 function tchHtml(){var S=L2(TCL),f=st.tcf||'all';var tabs='<div class="xg-tabs">'+['all','cp1','cp2'].map(function(k){return '<button type="button" class="xg-tab'+(f===k?' on':'')+'" onclick="st.tcf=\''+k+'\';render()">'+esc(S[k])+'</button>';}).join('')+'</div>';
 var body=TCH.filter(function(g){return f==='all'||f===g[0];}).map(function(g){return '<h3 class="tc-y">'+esc(S[g[0]])+'</h3><div class="tc-grid">'+g[1].map(function(t){var ini=t[1].split(' ').map(function(w){return w[0];}).slice(0,2).join('');
