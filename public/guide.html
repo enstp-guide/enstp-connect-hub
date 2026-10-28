@@ -141,6 +141,7 @@ var D = {"guides":[{"slug":"campus","title":"Se repérer sur le campus","short":
 var HERO = "/guide-hero.webp";
 
 var P = {
+  instagram: '<rect width="18" height="18" x="3" y="3" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".8" fill="currentColor" stroke="none"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   'arrow-right': '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
   'arrow-up-right': '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
@@ -261,7 +262,7 @@ function lockedHeader() {
 function footer() {
   var t = T();
   return '<footer class="site-footer"><div class="footer-inner"><a href="#/" class="footer-brand"><span dir="ltr">enstp<span class="brand-go">go</span></span> <small>' + esc(t.footerTag) + '</small></a>' +
-    '<div><a href="https://enstp.edu.dz/" target="_blank" rel="noreferrer">' + esc(t.official) + ' ' + ic('arrow-up-right', 14) + '</a><span>' + esc(t.footerNote) + '</span>' + (member ? '<button type="button" class="signout" data-signout="1">' + esc(GATE[lang].o) + '</button>' : '') + '</div></div></footer>';
+    '<div><a href="https://www.instagram.com/enstp_go/" target="_blank" rel="noopener noreferrer">' + ic('instagram', 14) + ' Instagram @enstp_go ' + ic('arrow-up-right', 14) + '</a><a href="https://enstp.edu.dz/" target="_blank" rel="noreferrer">' + esc(t.official) + ' ' + ic('arrow-up-right', 14) + '</a><span>' + esc(t.footerNote) + '</span>' + (member ? '<button type="button" class="signout" data-signout="1">' + esc(GATE[lang].o) + '</button>' : '') + '</div></div></footer>';
 }
 function home() {
   var t = T(), gs = guides();
