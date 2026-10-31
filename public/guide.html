@@ -346,8 +346,8 @@ function gmStars(r){var s='';for(var i=1;i<=5;i++)s+='<span class="'+(r>=i-.25?'
 function gmRev(name,k){var g=GMP.d[name];if(!g||!g.rv.length)return '';var v=g.rv[k%g.rv.length];return '<div class="gm-rv" data-gmr="'+esc(name)+'" data-k="'+k+'"><div class="gm-rvh">'+ic('quote',13)+' <b>'+esc(L2(GL).rev)+'</b>'+(g.rv.length>1?'<button type="button" data-gmrn>'+esc(L2(GL).more)+' ↻</button>':'')+'</div><p dir="auto">“'+esc(v.t)+'”</p><small dir="auto">— '+esc(v.a||'')+(v.s?' · <span class="gm-st">'+gmStars(v.s)+'</span>':'')+'</small></div>';}
 function gmExtra(name,food){var g=GMP.d[name],T=L2(GL);if(!g)return '';var fav=gmFavs().indexOf(name)>=0,h='';
 if(g.r)h+='<div class="gm-rate"><span class="gm-st">'+gmStars(g.r)+'</span> <b dir="ltr">'+g.r.toFixed(1)+'/5</b> <span dir="ltr">('+g.n+' '+esc(T.avis)+')</span></div>';
-if(g.tel)h+='<a class="gm-tel" href="tel:'+g.tel.replace(/\s/g,'')+'" dir="ltr">'+ic('phone',13)+' '+esc(g.tel)+'</a>';
-if(g.pl&&PLV[g.pl]!=null)h+='<span class="xg-badge xg-paid">'+esc(T.pl[PLV[g.pl]])+' '+'DA'.repeat(Math.max(1,PLV[g.pl]))+'</span>';
+if(g.tel)h+='<a class="gm-tel" href="tel:'+g.tel.replace(/\s/g,'')+'">'+ic('phone',13)+' <bdi dir="ltr">'+esc(g.tel)+'</bdi></a>';
+if(g.pl&&PLV[g.pl]!=null)h+='<span class="xg-badge xg-paid">'+esc(T.pl[PLV[g.pl]])+'</span>';
 if(g.h)h+='<details class="gm-hrs"><summary>'+ic('clock',13)+' '+esc(T.hours)+'</summary><ul dir="ltr">'+g.h.map(function(d){return '<li>'+esc(d)+'</li>';}).join('')+'</ul></details>';
 h+=gmRev(name,Math.floor(Math.random()*Math.max(1,g.rv.length)));
 var dest=g.ll[0]+','+g.ll[1],a=function(href,icn,l,cls){return '<a class="gm-btn'+(cls||'')+'" href="'+href+'" target="_blank" rel="noopener noreferrer">'+ic(icn,15)+'<span>'+esc(l)+'</span></a>';};
