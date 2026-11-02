@@ -294,7 +294,7 @@ function home() {
     '<div class="quick-band"><div class="quick-inner page-width"><span class="quick-label">' + esc(t.looking) + '</span>' + quick + '</div></div>' +
     '<section aria-label="Présentation de l’école" class="page-width"><iframe id="schoolFrame" title="Histoire et présentation de l’ENSTP" src="/ecole?embed=true" style="display:block;width:100%;height:1800px;border:0" scrolling="no"></iframe></section>' +
     '<section id="explorer" class="guide-section page-width"><div class="section-top"><div><div class="eyebrow">' + esc(t.daily) + '</div><h2>' + esc(t.need) + '</h2><p>' + esc(t.needSub) + '</p></div>' +
-    '<span class="section-count">' + ic('grid', 13) + ' ' + esc(t.count) + '</span></div>' +
+    '<span class="section-count">' + ic('grid', 13) + ' ' + gs.length + ' ' + esc({fr:'rubriques à explorer',en:'sections to explore',ar:'قسمًا للاستكشاف'}[lang]) + '</span></div>' +
     '<div class="filter-row" aria-label="' + esc(t.filterAria) + '">' + filters + '</div><div class="guide-grid">' + cards + '</div></section>' +
     '<section class="bottom-band page-width"><div class="first-days"><span>' + ic('graduation', 23) + '</span><div><h3>' + esc(t.firstTitle) + '</h3><p>' + esc(t.firstA) + '<br>' + esc(t.firstB) + '</p>' +
     '<a href="' + gl('campus') + '" class="text-link">' + esc(t.firstLink) + ' ' + ic('arrow-right', 14, 'rtl-flip') + '</a></div></div>' +
@@ -366,7 +366,7 @@ var CANT={fr:['Menu de la cantine','Restaurant universitaire · petit-déjeuner,
 function cantOpen(){var c=CANT[lang]||CANT.fr;var m=document.createElement('div');m.id='cantModal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label',c[0]);m.style.cssText='position:fixed;inset:0;z-index:100;background:oklch(0 0 0 / .55);display:grid;place-items:center;padding:16px';var dk=document.documentElement.classList.contains('dark')?1:0;m.innerHTML='<div style="position:relative;width:min(820px,100%);height:min(92vh,980px);background:var(--background);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)"><button type="button" data-cant-close aria-label="'+esc(c[3])+'" style="position:absolute;top:10px;inset-inline-end:10px;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--foreground);cursor:pointer;font-size:18px">×</button><iframe title="'+esc(c[0])+'" src="cantine.html?embed=1&lang='+lang+'&dark='+dk+'" style="width:100%;height:100%;border:0"></iframe></div>';document.body.appendChild(m);document.body.style.overflow='hidden';}
 function cantClose(){var m=document.getElementById('cantModal');if(m){m.remove();document.body.style.overflow='';}}
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-cant-open]'))cantOpen();else if(e.target.id==='cantModal'||(e.target.closest&&e.target.closest('[data-cant-close]')))cantClose();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')cantClose();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){cantClose();loisClose();}});
 window.addEventListener('message',function(e){if(e.data&&e.data.type==='cantine-close')cantClose();});
 var LOISL={fr:{h:'Loisirs & patrimoine à Alger',sub:'Cinq lieux incontournables, avec les règles à respecter sur place.',det:'Détails & règles',rules:'À respecter sur place',close:'Fermer'},en:{h:'Leisure & heritage in Algiers',sub:'Five must-see places, with the rules to follow on site.',det:'Details & rules',rules:'Rules to follow on site',close:'Close'},ar:{h:'الترفيه والتراث في الجزائر',sub:'خمسة أماكن لا تُفوَّت، مع القواعد الواجب احترامها في الموقع.',det:'التفاصيل والقواعد',rules:'قواعد يجب احترامها في الموقع',close:'إغلاق'}};
 var LOIS=[
@@ -578,6 +578,7 @@ function guidePage(slug) {
   if (slug === 'alger') sections = algHtml();
   if (slug === 'campus') sections = cmHtml();
   if (slug === 'sport') sections = spHtml();
+  if (slug === 'loisirs') sections = loisHtml();
   if (slug === 'services') sections = svcHtml() + tchHtml();
   var side = '';
   if (shown) {
