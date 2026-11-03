@@ -1,5 +1,5 @@
 import { displayName } from "@/lib/display-name";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -89,8 +89,25 @@ function Aide() {
     return () => ob.disconnect();
   }, [embed]);
 
+  // The community is the only login-protected page: guests are sent to /auth
+  // (or shown a sign-in prompt when embedded in the guide).
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (uid === null && !embed) navigate({ to: "/auth", replace: true });
+  }, [uid, embed, navigate]);
+
   const dir = lang === "ar" ? "rtl" : "ltr";
   const tabs: [Tab, string][] = [["home", t.navHome], ["wilayas", t.navWilayas], ["knowledge", t.navKnowledge]];
+
+  if (uid === null)
+    return (
+      <main ref={root} className="grid min-h-[50vh] place-items-center bg-background px-4 py-10 text-foreground">
+        <div dir={dir} lang={lang} className="text-center">
+          <p className="text-sm font-semibold">{t.login}</p>
+          <Link to="/auth" target={embed ? "_top" : "_self"} className="mt-3 inline-block rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
+        </div>
+      </main>
+    );
 
   return (
     <main ref={root} className={embed ? "bg-background text-foreground" : "min-h-screen bg-background px-4 py-8 text-foreground"}>
@@ -107,7 +124,7 @@ function Aide() {
           {(tab === "wilayas" || tab === "knowledge") && uid === null && (
             <div className="grid place-items-center rounded-2xl border border-dashed border-border bg-card py-16 text-center">
               <p className="text-sm font-semibold">{t.login}</p>
-              <Link to="/" target={embed ? "_top" : "_self"} className="mt-3 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
+              <Link to="/auth" target={embed ? "_top" : "_self"} className="mt-3 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground">{t.loginBtn}</Link>
             </div>
           )}
           {tab === "wilayas" && uid && <Wilayas t={t} uid={uid} name={name} counts={stats.by} lang={lang} />}

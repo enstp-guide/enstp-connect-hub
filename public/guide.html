@@ -253,7 +253,9 @@ function header(r) {
     '<nav class="desktop-nav" aria-label="Navigation"><a href="#/"' + (r.name === 'home' ? ' class="nav-active"' : '') + '>' + esc(t.navGuide) + '</a>' +
     '<a href="#/ecole">L’École</a>' + '<a href="' + gl('aide') + '">مجتمع ENSTP</a>' + '<a href="' + gl('campus') + '">' + esc(t.navCampus) + '</a><a href="' + gl('vie-etudiante') + '">' + esc(t.navLife) + '</a><a href="' + gl('transport') + '">ENSTP Travel</a>' +
     '<a href="' + gl('alger') + '">' + esc(t.navAlger) + ' ' + ic('arrow-up-right', 14) + '</a></nav>' +
-    '<div class="header-actions"><div class="lang-switch" role="group" aria-label="' + esc(t.language) + '">' + langs + '</div>' + '<a class="account-btn" href="#/compte">' + ic('user', 16) + '<span>' + (lang==='ar'?'حسابي':lang==='en'?'My Account':'Mon compte') + '</span></a>' +
+    '<div class="header-actions"><div class="lang-switch" role="group" aria-label="' + esc(t.language) + '">' + langs + '</div>' + (member
+      ? '<a class="account-btn" href="#/compte">' + ic('user', 16) + '<span>' + (lang==='ar'?'حسابي':lang==='en'?'My Account':'Mon compte') + '</span></a>'
+      : '<a class="account-btn" href="/auth" target="_top">' + ic('user', 16) + '<span>' + (lang==='ar'?'تسجيل الدخول':lang==='en'?'Log in':'Connexion') + '</span></a>') +
     '<div class="header-tools"><button type="button" class="btn btn-ghost btn-icon" aria-label="' + esc(t.search) + '" data-search="1">' + ic('search', 20) + '</button>' +
     '<a class="btn btn-outline help-button" href="' + gl('aide') + '">' + ic('help', 16) + ' ' + esc(t.help) + '</a>' +
     '<button type="button" class="btn btn-ghost btn-icon mobile-menu" aria-label="' + esc(t.openMenu) + '" aria-expanded="' + st.menu + '" aria-controls="header-mobile-nav" data-menu="1">' + ic(st.menu ? 'x' : 'menu', 16) + '</button></div></div></div>' +
@@ -625,9 +627,9 @@ function render() {
     var g = guides().filter(function (x) { return x.slug === r.slug; })[0];
     if (g) title = g.short + ' · ENSTP Go';
   }
-  document.title = (member && profile) ? title : 'ENSTP Go';
-  var inside = !!(member && profile);
-  document.getElementById('app').innerHTML = inside ? header(r) + (r.name === 'home' ? home() : guidePage(r.slug)) + footer() : lockedHeader() + gate() + footer();
+  document.title = title;
+  // The guide is public: guests browse freely; only the community page requires login.
+  document.getElementById('app').innerHTML = header(r) + (r.name === 'home' ? home() : guidePage(r.slug)) + footer();
   overlay();
 }
 
