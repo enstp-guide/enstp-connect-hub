@@ -93,7 +93,7 @@ function Compte() {
       <main className="grid min-h-screen place-items-center bg-background p-6 text-center">
         <div>
           <p className="font-semibold">Connectez-vous pour voir votre compte.</p>
-          <Link to="/" className="mt-3 inline-block rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Se connecter</Link>
+          <Link to="/auth" className="mt-3 inline-block rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Se connecter</Link>
         </div>
       </main>
     );

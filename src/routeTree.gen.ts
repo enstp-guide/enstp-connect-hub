@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AideRouteImport } from './routes/aide'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CompteRouteImport } from './routes/compte'
 import { Route as EcoleRouteImport } from './routes/ecole'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AideRoute = AideRouteImport.update({
   id: '/aide',
   path: '/aide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompteRoute = CompteRouteImport.update({
@@ -56,6 +62,7 @@ const ApiChatRoute = ApiChatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aide': typeof AideRoute
+  '/auth': typeof AuthRoute
   '/compte': typeof CompteRoute
   '/ecole': typeof EcoleRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aide': typeof AideRoute
+  '/auth': typeof AuthRoute
   '/compte': typeof CompteRoute
   '/ecole': typeof EcoleRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aide': typeof AideRoute
+  '/auth': typeof AuthRoute
   '/compte': typeof CompteRoute
   '/ecole': typeof EcoleRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aide'
+    | '/auth'
     | '/compte'
     | '/ecole'
     | '/reset-password'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aide'
+    | '/auth'
     | '/compte'
     | '/ecole'
     | '/reset-password'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aide'
+    | '/auth'
     | '/compte'
     | '/ecole'
     | '/reset-password'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AideRoute: typeof AideRoute
+  AuthRoute: typeof AuthRoute
   CompteRoute: typeof CompteRoute
   EcoleRoute: typeof EcoleRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/aide'
       fullPath: '/aide'
       preLoaderRoute: typeof AideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compte': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AideRoute: AideRoute,
+  AuthRoute: AuthRoute,
   CompteRoute: CompteRoute,
   EcoleRoute: EcoleRoute,
   ResetPasswordRoute: ResetPasswordRoute,
