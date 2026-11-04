@@ -565,7 +565,7 @@ function guidePage(slug) {
     shown = g.searches.filter(function (s) { return s.query === st.map; })[0] || g.searches[0];
   }
   if (slug === 'transport') {
-    return '<main class="detail-main"><section aria-label="ENSTP Travel"><iframe id="travelFrame" title="ENSTP Travel" src="/travel.html?embed=1&lang=' + lang + '" style="display:block;width:100%;height:2400px;border:0;border-radius:16px" scrolling="no"></iframe></section></main>';
+    return '<main class="detail-main"><div class="th-wrap" data-transport-hub data-lang="' + lang + '"></div><section aria-label="ENSTP Travel"><iframe id="travelFrame" title="ENSTP Travel" src="/travel.html?embed=1&lang=' + lang + '" style="display:block;width:100%;height:2400px;border:0;border-radius:16px" scrolling="no"></iframe></section></main>';
   }
   if (slug === 'aide') {
     return '<main class="detail-main"><section aria-label="مجتمع ENSTP"><iframe id="communityFrame" title="ENSTP" src="/aide?embed=true&lang=' + lang + '" style="display:block;width:100%;height:720px;border:0" scrolling="no"></iframe></section></main>';
@@ -720,5 +720,6 @@ window.addEventListener('message', function (e) {
 });
 render();
 </script>
+<script src="/transport-hub.js" defer></script>
 </body>
 </html>
