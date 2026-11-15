@@ -100,7 +100,7 @@
 
         const cousFixedData = [
             {
-                time: "02:30",
+                time: "14:30",
                 frequency: { en: "Every 1h", fr: "Chaque 1h", ar: "كل 1 ساعة" },
                 destinations: {
                     en: ["Sidi Abdellah", "Blida", "Draria", "Koléa", "Bousmaïl", "Hadjout", "Tipaza", "Ben Talha", "Baraki", "Boufarik", "Zéralda"],
@@ -110,7 +110,7 @@
                 type: "regular"
             },
             {
-                time: "02:30",
+                time: "14:30",
                 frequency: { en: "Every 1h", fr: "Chaque 1h", ar: "كل 1 ساعة" },
                 destinations: {
                     en: ["Kalitous", "Larbaâ"],
@@ -285,25 +285,43 @@
 
   var css = '.th-wrap{font-family:Inter,system-ui,sans-serif;margin:0 0 20px}.th-wrap[dir=rtl],.th-modal[dir=rtl]{font-family:Cairo,Tajawal,sans-serif}' +
     '.th-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:640px){.th-grid{grid-template-columns:1fr}}' +
-    '.th-card{background:#1E1E1E;color:#f1f5f9;border:1px solid #2c2c2e;border-radius:20px;padding:22px;cursor:pointer;text-align:start;display:flex;flex-direction:column;gap:12px;transition:transform .2s,border-color .2s;font:inherit}' +
+    '.th-card{background:#fff;color:#0f172a;border:1px solid #e2e8f0;border-radius:20px;padding:22px;cursor:pointer;text-align:start;display:flex;flex-direction:column;gap:12px;transition:transform .2s,border-color .2s;font:inherit}' +
     '.th-card:hover{transform:translateY(-2px);border-color:#FF5722}.th-badge{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#FF5722;background:rgba(255,87,34,.14);border:1px solid rgba(255,87,34,.35);padding:4px 10px;border-radius:999px}' +
-    '.th-card h3{margin:0;font-size:20px;font-weight:900;color:#fff}.th-card p{margin:0;font-size:13px;line-height:1.55;color:#a1a1aa}' +
+    '.th-card h3{margin:0;font-size:20px;font-weight:900;color:#0f172a}.th-card p{margin:0;font-size:13px;line-height:1.55;color:#475569}' +
     '.th-btn{align-self:flex-start;background:#FF5722;color:#fff;border:0;border-radius:12px;padding:10px 16px;font-weight:800;font-size:13px}' +
-    '.th-modal{position:fixed;inset:0;z-index:9999;background:#121212;color:#f1f5f9;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif}' +
-    '.th-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #2c2c2e}.th-top h2{margin:0;flex:1;font-size:18px;font-weight:900;color:#fff}' +
-    '.th-seg{display:flex;background:#1E1E1E;border:1px solid #2c2c2e;border-radius:12px;padding:3px}.th-seg button{background:none;border:0;color:#a1a1aa;font:inherit;font-weight:800;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer;min-height:34px}.th-seg button.on{background:#FF5722;color:#fff}' +
-    '.th-x{background:#1E1E1E;border:1px solid #2c2c2e;color:#fff;border-radius:12px;width:40px;height:40px;font-size:20px;cursor:pointer}' +
+    '.th-modal{position:fixed;inset:0;z-index:9999;background:#f8fafc;color:#0f172a;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif}' +
+    '.th-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #e2e8f0}.th-top h2{margin:0;flex:1;font-size:18px;font-weight:900;color:#0f172a}' +
+    '.th-seg{display:flex;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;padding:3px}.th-seg button{background:none;border:0;color:#64748b;font:inherit;font-weight:800;font-size:12px;padding:7px 11px;border-radius:9px;cursor:pointer;min-height:34px}.th-seg button.on{background:#FF5722;color:#fff}' +
+    '.th-x{background:#fff;border:1px solid #e2e8f0;color:#0f172a;border-radius:12px;width:40px;height:40px;font-size:20px;cursor:pointer}' +
     '.th-body{flex:1;overflow:auto;padding:18px;max-width:960px;width:100%;margin:0 auto;box-sizing:border-box}' +
-    '.th-search{width:100%;box-sizing:border-box;background:#1E1E1E;border:1px solid #2c2c2e;color:#fff;border-radius:14px;padding:12px 14px;font:inherit;font-size:14px;margin-bottom:14px;outline:none}.th-search:focus{border-color:#FF5722}' +
+    '.th-search{width:100%;box-sizing:border-box;background:#fff;border:1px solid #e2e8f0;color:#0f172a;border-radius:14px;padding:12px 14px;font:inherit;font-size:14px;margin-bottom:14px;outline:none}.th-search:focus{border-color:#FF5722}' +
     '.th-h{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#FF5722;margin:18px 0 10px}' +
-    '.th-row{background:#1E1E1E;border:1px solid #2c2c2e;border-radius:16px;padding:14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}' +
-    '.th-time{font-size:22px;font-weight:900;color:#fff;min-width:74px;font-variant-numeric:tabular-nums}.th-time small{display:block;font-size:11px;color:#FF5722;font-weight:700}' +
-    '.th-tags{display:flex;flex-wrap:wrap;gap:6px}.th-tag{font-size:12px;font-weight:700;background:#282828;border:1px solid #2c2c2e;color:#e4e4e7;padding:4px 9px;border-radius:999px}' +
-    '.th-pills{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}.th-pill{flex:none;background:#1E1E1E;border:1px solid #2c2c2e;color:#a1a1aa;font:inherit;font-weight:800;font-size:12px;padding:8px 14px;border-radius:12px;cursor:pointer}.th-pill.on{background:#FF5722;border-color:#FF5722;color:#fff}' +
-    '.th-line{background:#1E1E1E;border:1px solid #2c2c2e;border-radius:18px;margin-bottom:14px;overflow:hidden}.th-lh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;background:#282828;border-bottom:1px solid #2c2c2e}' +
-    '.th-code{background:#FF5722;color:#fff;font-weight:900;font-size:12px;padding:5px 10px;border-radius:10px}.th-note{font-size:11px;color:#fcd34d;margin-inline-start:6px}.th-dirs{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px}@media(max-width:640px){.th-dirs{grid-template-columns:1fr}}' +
-    '.th-dir b{display:block;font-size:12px;color:#e4e4e7;margin-bottom:8px}.th-chips{display:flex;flex-wrap:wrap;gap:6px}.th-chip{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;background:#121212;border:1px solid #3f3f46;color:#fff;padding:4px 8px;border-radius:8px}' +
-    '.th-empty{text-align:center;color:#a1a1aa;padding:40px 10px}';
+    '.th-row{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}' +
+    '.th-time{font-size:22px;font-weight:900;color:#0f172a;min-width:74px;font-variant-numeric:tabular-nums}.th-time small{display:block;font-size:11px;color:#FF5722;font-weight:700}' +
+    '.th-tags{display:flex;flex-wrap:wrap;gap:6px}.th-tag{font-size:12px;font-weight:700;background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:4px 9px;border-radius:999px}' +
+    '.th-pills{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}.th-pill{flex:none;background:#fff;border:1px solid #e2e8f0;color:#64748b;font:inherit;font-weight:800;font-size:12px;padding:8px 14px;border-radius:12px;cursor:pointer}.th-pill.on{background:#FF5722;border-color:#FF5722;color:#fff}' +
+    '.th-line{background:#fff;border:1px solid #e2e8f0;border-radius:18px;margin-bottom:14px;overflow:hidden}.th-lh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;background:#f1f5f9;border-bottom:1px solid #e2e8f0}' +
+    '.th-code{background:#FF5722;color:#fff;font-weight:900;font-size:12px;padding:5px 10px;border-radius:10px}.th-note{font-size:11px;color:#b45309;margin-inline-start:6px}.th-dirs{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px}@media(max-width:640px){.th-dirs{grid-template-columns:1fr}}' +
+    '.th-dir b{display:block;font-size:12px;color:#334155;margin-bottom:8px}.th-chips{display:flex;flex-wrap:wrap;gap:6px}.th-chip{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;background:#fff;border:1px solid #cbd5e1;color:#0f172a;padding:4px 8px;border-radius:8px}' +
+    '.th-dest{font-size:12px;font-weight:800;color:#475569}' +
+    '.th-empty{text-align:center;color:#64748b;padding:40px 10px}' +
+    'html.dark .th-card{background:#1E1E1E;color:#f1f5f9;border-color:#2c2c2e}' +
+    'html.dark .th-card h3{color:#fff}html.dark .th-card p{color:#a1a1aa}' +
+    'html.dark .th-modal{background:#121212;color:#f1f5f9}' +
+    'html.dark .th-top{border-color:#2c2c2e}html.dark .th-top h2{color:#fff}' +
+    'html.dark .th-seg{background:#1E1E1E;border-color:#2c2c2e}html.dark .th-seg button{color:#a1a1aa}html.dark .th-seg button.on{color:#fff}' +
+    'html.dark .th-x{background:#1E1E1E;border-color:#2c2c2e;color:#fff}' +
+    'html.dark .th-search{background:#1E1E1E;border-color:#2c2c2e;color:#fff}' +
+    'html.dark .th-row{background:#1E1E1E;border-color:#2c2c2e}' +
+    'html.dark .th-time{color:#fff}' +
+    'html.dark .th-tag{background:#282828;border-color:#2c2c2e;color:#e4e4e7}' +
+    'html.dark .th-pill{background:#1E1E1E;border-color:#2c2c2e;color:#a1a1aa}html.dark .th-pill.on{color:#fff}' +
+    'html.dark .th-line{background:#1E1E1E;border-color:#2c2c2e}html.dark .th-lh{background:#282828;border-color:#2c2c2e}' +
+    'html.dark .th-note{color:#fcd34d}' +
+    'html.dark .th-dir b{color:#e4e4e7}' +
+    'html.dark .th-chip{background:#121212;border-color:#3f3f46;color:#fff}' +
+    'html.dark .th-dest{color:#d4d4d8}' +
+    'html.dark .th-empty{color:#a1a1aa}';
 
   function cards(el) {
     var t = T();
@@ -332,7 +350,7 @@
     }).map(function (x) {
       var tm = x.terminals[l];
       function dir(from, to, arr) { return '<div class="th-dir"><b>' + esc(from) + ' → ' + esc(to) + '</b><div class="th-chips">' + arr.map(function (d) { return '<span class="th-chip">' + d + '</span>'; }).join('') + '</div></div>'; }
-      return '<div class="th-line"><div class="th-lh"><span><span class="th-code">' + esc(x.code[l]) + '</span>' + (x.note ? '<span class="th-note">' + esc(x.note[l]) + '</span>' : '') + '</span><span style="font-size:12px;font-weight:800;color:#d4d4d8">' + esc(tm.A) + ' ↔ ' + esc(tm.B) + '</span></div><div class="th-dirs">' + dir(tm.A, tm.B, x.departuresA) + dir(tm.B, tm.A, x.departuresB) + '</div></div>';
+      return '<div class="th-line"><div class="th-lh"><span><span class="th-code">' + esc(x.code[l]) + '</span>' + (x.note ? '<span class="th-note">' + esc(x.note[l]) + '</span>' : '') + '</span><span class="th-dest">' + esc(tm.A) + ' ↔ ' + esc(tm.B) + '</span></div><div class="th-dirs">' + dir(tm.A, tm.B, x.departuresA) + dir(tm.B, tm.A, x.departuresB) + '</div></div>';
     }).join('');
     return { pills: pills, body: body };
   }
