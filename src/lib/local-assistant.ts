@@ -117,20 +117,20 @@ const toMin = (t: string) => {
 
 // ---------- Détection du jour, de l’heure, de la classe et du groupe ----------
 const DAY_WORDS: [string, string[]][] = [
-  ["Saturday", ["samedi", "saturday", "السبت", "سبت", "sebt"]],
-  ["Sunday", ["dimanche", "sunday", "الأحد", "الاحد", "لحد", "حد", "lahad", "l7ad"]],
-  ["Monday", ["lundi", "monday", "الإثنين", "الاثنين", "الإتنين", "الاتنين", "tnin", "letnin", "etnin"]],
-  ["Tuesday", ["mardi", "tuesday", "الثلاثاء", "الثلاثا", "تلاتا", "tlata", "tlat"]],
-  ["Wednesday", ["mercredi", "wednesday", "الأربعاء", "الاربعاء", "لاربعا", "larbaa", "larba3"]],
-  ["Thursday", ["jeudi", "thursday", "الخميس", "لخميس", "khmis", "lkhmis"]],
-  ["Friday", ["vendredi", "friday", "الجمعة", "جمعة", "jemaa", "jem3a"]],
+  ["Saturday", ["samedi", "saturday", "السبت", "سبت", "لسبت", "sebt", "essebt", "lsebt"]],
+  ["Sunday", ["dimanche", "sunday", "الأحد", "الاحد", "لحد", "حد", "lahad", "l7ad", "lhad", "lhed", "l7ed", "el had", "el 7ad"]],
+  ["Monday", ["lundi", "monday", "الإثنين", "الاثنين", "الإتنين", "الاتنين", "tnin", "letnin", "etnin", "ltnin", "el tnin", "letnine"]],
+  ["Tuesday", ["mardi", "tuesday", "الثلاثاء", "الثلاثا", "تلاتا", "tlata", "tlat", "ttlata", "et tlata", "eltlata", "التلاتا"]],
+  ["Wednesday", ["mercredi", "wednesday", "الأربعاء", "الاربعاء", "لاربعا", "larbaa", "larba3", "lerba3", "lerbaa", "larb3a", "الاربعا"]],
+  ["Thursday", ["jeudi", "thursday", "الخميس", "لخميس", "khmis", "lkhmis", "lekhmis", "el khmis", "الخميس"]],
+  ["Friday", ["vendredi", "friday", "الجمعة", "جمعة", "jemaa", "jem3a", "ljem3a", "ljemaa", "el djemaa"]],
 ];
 const JS_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-function findDay(q: string): string | null {
-  const today = new Date().getDay();
-  if (has(q, ["aujourd hui", "aujourdhui", "today", "اليوم", "lyoum", "lyom"])) return JS_DAYS[today]!;
-  if (has(q, ["demain", "tomorrow", "غدا", "غدوة", "ghodwa", "ghedwa"])) return JS_DAYS[(today + 1) % 7]!;
+function findDay(q: string, now: Date = new Date()): string | null {
+  const today = now.getDay();
+  if (has(q, ["aujourd hui", "aujourdhui", "today", "اليوم", "واليوم", "lyoum", "lyom", "elyoum"])) return JS_DAYS[today]!;
+  if (has(q, ["demain", "tomorrow", "غدا", "غدوة", "وغدوة", "وغدا", "ghodwa", "ghedwa", "ghdwa"])) return JS_DAYS[(today + 1) % 7]!;
   for (const [day, words] of DAY_WORDS) if (has(q, words.map(norm))) return day;
   return null;
 }
@@ -145,7 +145,7 @@ function findTime(raw: string): number | null {
     if (m[2] === "pm") h += 12;
     return h * 60;
   }
-  m = /(?:a|à|at|vers|على|الساعة)\s*(\d{1,2})\b(?!\s*(?:e|eme|ème|ere|ère|er|st|nd|rd|th))/.exec(s);
+  m = /(?:^|\s)(?:a|à|at|vers|3la|ala|f|fi|على|في|الساعة)\s*(\d{1,2})\b(?!\s*(?:e|eme|ème|ere|ère|er|st|nd|rd|th))/.exec(s);
   if (m) {
     const h = Number(m[1]);
     if (h >= 1 && h <= 18) return (h < 7 ? h + 12 : h) * 60;
@@ -266,7 +266,30 @@ function findSubject(q: string): { label: string; hits: Hit[] } | null {
 }
 
 // ---------- Mise en forme ----------
-const label = (cls: string) => GROUPS.find((g) => g.id === cls)?.label ?? cls;
+const CLASS_LABEL: Record<Lang, Record<string, string>> = {
+  fr: {},
+  en: {
+    CP1: "1st year · Preparatory class (CP1)", CP2: "2nd year · Preparatory class (CP2)",
+    DIB1: "DIB · 1st engineering year (3rd year)", DIB2: "DIB · 2nd engineering year (4th year)", DIB3: "DIB · 3rd engineering year (5th year)",
+    DMS1: "DMS · 1st engineering year (3rd year)", DMS2: "DMS · 2nd engineering year (4th year)", DMS3: "DMS · 3rd engineering year (5th year)",
+  },
+  ar: {
+    CP1: "السنة الأولى تحضيري (CP1)", CP2: "السنة الثانية تحضيري (CP2)",
+    DIB1: "DIB · السنة الثالثة", DIB2: "DIB · السنة الرابعة", DIB3: "DIB · السنة الخامسة",
+    DMS1: "DMS · السنة الثالثة", DMS2: "DMS · السنة الرابعة", DMS3: "DMS · السنة الخامسة",
+  },
+};
+const label = (cls: string, lang: Lang = "fr") => CLASS_LABEL[lang][cls] ?? GROUPS.find((g) => g.id === cls)?.label ?? cls;
+/** « Groupe 3 » / « Group 3 » / « الفوج 3 », « Section 2 »… */
+function uLabel(cls: string, value: string, lang: Lang): string {
+  const st = STRUCTURE[cls];
+  const fr = st?.units.find((u) => u.value === value)?.label ?? value;
+  if (lang === "fr") return fr;
+  const n = fr.replace(/^\D+/, "");
+  const isSection = /section|sec/i.test(fr);
+  if (lang === "en") return `${isSection ? "Section" : "Group"} ${n}`;
+  return `${isSection ? "القسم" : "الفوج"} ${n}`;
+}
 function line(s: Session, lang: Lang, withDay = false, cls?: string): string {
   const t = T[lang];
   const parts = [
@@ -274,7 +297,7 @@ function line(s: Session, lang: Lang, withDay = false, cls?: string): string {
     `${s.subject}${s.kind ? ` (${s.kind})` : ""}`,
     s.teacher || t.teacherNone,
     s.room ? (/^\d/.test(s.room) ? `${t.room} ${s.room}` : s.room) : "",
-    cls ? label(cls) : "",
+    cls ? label(cls, lang) : "",
   ].filter(Boolean);
   return `- ${parts.join(" · ")}`;
 }
@@ -300,11 +323,11 @@ function timetable(cls: string, unit: string, day: string | null, time: number |
     } else list = now;
   }
   list.sort(sortS);
-  const unitLabel = unit ? st.units.find((u) => u.value === unit)?.label ?? unit : "";
-  const head = `📅 **${label(cls)}**${unitLabel ? ` — ${unitLabel}` : ""}${day ? ` — ${DAY_NAME[lang][day]}` : ""}${time != null ? ` ${t.at} ${Math.floor(time / 60)}h${String(time % 60).padStart(2, "0")}` : ""}`;
+  const unitLabel = unit ? uLabel(cls, unit, lang) : "";
+  const head = `📅 **${label(cls, lang)}**${unitLabel ? ` — ${unitLabel}` : ""}${day ? ` — ${DAY_NAME[lang][day]}` : ""}${time != null ? ` ${t.at} ${Math.floor(time / 60)}h${String(time % 60).padStart(2, "0")}` : ""}`;
   const grp = (s: Session) =>
     !unit && !st.promo && s.sections.length && s.sections.length <= 3
-      ? ` (${s.sections.map((v) => st.units.find((u) => u.value === v)?.label ?? v).join(", ")})`
+      ? ` (${s.sections.map((v) => uLabel(cls, v, lang)).join(", ")})`
       : "";
   const body = list.length ? list.map((s) => line(s, lang, !day) + grp(s)).join("\n") : t.noCourse;
   const hint = !unit && !st.promo ? `\n\n${t.pickGroup(st.unitName, st.units.map((u) => u.label.replace(/^\D+/, "")).join(", "))}` : "";
@@ -327,7 +350,7 @@ function hitsList(hits: Hit[], cls: string | null, unit: string, day: string | n
   const max = 15;
   const out = h.slice(0, max).map((x) => {
     const st = STRUCTURE[x.cls];
-    const grp = st && !st.promo && x.s.sections.length && x.s.sections.length <= 3 ? ` (${x.s.sections.map((v) => st.units.find((u) => u.value === v)?.label ?? v).join(", ")})` : "";
+    const grp = st && !st.promo && x.s.sections.length && x.s.sections.length <= 3 ? ` (${x.s.sections.map((v) => uLabel(x.cls, v, lang)).join(", ")})` : "";
     return `${line(x.s, lang, true, cls ? undefined : x.cls)}${grp}`;
   });
   return out.join("\n") + (h.length > max ? `\n\n${T[lang].more(h.length - max)}` : "");
@@ -439,30 +462,32 @@ const LIBRARY = {
   ar: "\n\n📚 التوقيت: **09:00 – 15:30**، بطاقة الطالب إلزامية. سجّل عبر الإنترنت. لبراءة الذمة، سوِّ وضعيتك مع المكتبة أولاً ثم الإدارة.",
 };
 
-/** Point d’entrée : renvoie une réponse en Markdown. */
-export function localAnswer(raw: string, lang: Lang, ctx: AssistantContext = {}): string {
+type Parsed = {
+  q: string;
+  day: string | null;
+  time: number | null;
+  groupN: number | null;
+  askedGroup: boolean;
+  explicitClass: ClassId | null;
+  cls: ClassId | null;
+  teacherTok: string | undefined;
+};
+
+/** Réponse aux questions « classiques » une fois la question analysée. */
+function core(p: Parsed, lang: Lang): string {
   const t = T[lang];
-  const q = norm(raw);
-  if (!q) return `${t.hello}\n\n${t.examples}`;
-
-  if (/^(merci|thanks|thank you|thx|شكرا|saha|sahit|يعطيك الصحة)/.test(q)) return t.thanks;
-
-  const day = findDay(q);
-  const time = findTime(raw);
-  const groupN = findGroupNumber(q);
-  const explicitClass = findClass(q);
-  const cls = explicitClass ?? (ctx.defaultClass && STRUCTURE[ctx.defaultClass] ? (ctx.defaultClass as ClassId) : null);
+  const { q, day, time, groupN, explicitClass, cls } = p;
   const unit = cls ? unitFor(cls, groupN) : "";
 
   // 1) Un enseignant est cité → ses cours
-  const teacherTok = q.split(" ").find((w) => TEACHERS.has(w));
+  const teacherTok = p.teacherTok;
   if (teacherTok) {
     const e = TEACHERS.get(teacherTok)!;
     return `${t.teacherTitle(e.name)}\n\n${hitsList(e.hits, explicitClass, explicitClass ? unit : "", day, lang)}`;
   }
 
   // 2) Lieu : « où est l’amphi A », « salle 19 », « bibliothèque »…
-  const wantsPlace = has(q, ["ou", "where", "trouver", "aller", "acceder", "chemin", "itineraire", "أين", "وين"]);
+  const wantsPlace = has(q, ["ou", "where", "trouver", "aller", "acceder", "chemin", "itineraire", "أين", "وين", "win", "wine", "fin", "kayen", "kayna", "كاين", "كاينة"]);
   const topic = TOPICS.find((x) => x.re.test(q));
   if (topic && !explicitClass && day == null && time == null) return topic.ans[lang];
   const who = WHO_KEYS.find(([re]) => re.test(q));
@@ -499,7 +524,7 @@ export function localAnswer(raw: string, lang: Lang, ctx: AssistantContext = {})
   // 3) Emploi du temps (classe, groupe, jour, heure ou mots-clés)
   const subject = findSubject(q);
   const wantsTimetable =
-    day != null || time != null || groupN != null || explicitClass != null ||
+    day != null || time != null || p.askedGroup || explicitClass != null ||
     has(q, ["emploi", "edt", "cours", "planning", "timetable", "schedule", "class", "classes", "seance", "td", "tp", "جدول", "حصة", "حصص", "درس", "دروس"]);
   if (day === "Friday") return t.friday;
   if (wantsTimetable && !subject) {
@@ -533,4 +558,336 @@ export function localAnswer(raw: string, lang: Lang, ctx: AssistantContext = {})
   if (found.length) return `${t.guideFound}\n\n${found.map((l) => `- ${l}`).join("\n")}`;
 
   return `${t.unknown}\n\n${t.examples}`;
+}
+
+// ======================================================================
+// Couche « conversation » : salutations, mémoire de la discussion,
+// questions de suivi (« et lundi ? », « 3 »), prochain cours, fautes de frappe.
+// ======================================================================
+
+export type Intent = "tt" | "now" | "next" | "first" | "last";
+export type Memory = {
+  cls?: string | null;
+  group?: number | null;
+  day?: string | null;
+  time?: number | null;
+  intent?: Intent | null;
+  pending?: "class" | "group" | null;
+};
+export type Reply = { text: string; memory: Memory; chips: string[] };
+export type ChatContext = AssistantContext & { firstName?: string | null; memory?: Memory; now?: Date };
+
+const X = {
+  fr: {
+    hi: (n: string) => `Salut${n ? ` ${n}` : ""} ! 👋 Je suis l’assistant ENSTP Go. Demande-moi ton emploi du temps, ton prochain cours, une salle, un prof ou un service.`,
+    howAreYou: "Ça va bien, merci ! 😊 Et toi ? Dis-moi ce dont tu as besoin : ton prochain cours, une salle, un prof…",
+    whoAmI: "Je suis l’assistant d’ENSTP Go 🤖. Je connais les emplois du temps de toutes les classes, les salles, les enseignants et les services de l’école.",
+    askClass: "Tu es dans quelle classe ? 🙂",
+    askGroup: (u: string) => `C’est quel ${u.toLowerCase()} ? Réponds juste avec le numéro.`,
+    nowNone: "Tu n’as pas cours en ce moment. 🎉",
+    nextTitle: "⏭️ **Ton prochain cours :**",
+    nowTitle: "🟢 **En ce moment :**",
+    firstTitle: (d: string) => `🌅 **Premier cours ${d} :**`,
+    lastTitle: (d: string) => `🏁 **Dernier cours ${d} :**`,
+    noMore: "Aucun cours trouvé dans les prochains jours.",
+    chips: { next: "Mon prochain cours", today: "Aujourd’hui", tomorrow: "Demain", place: "Où est l’amphi A ?", who: "À qui m’adresser ?", help: "Que sais-tu faire ?" },
+    group: "Groupe",
+    today: "aujourd’hui",
+    of: (d: string) => `du ${d.toLowerCase()}`,
+  },
+  en: {
+    hi: (n: string) => `Hi${n ? ` ${n}` : ""}! 👋 I’m the ENSTP Go assistant. Ask me for your timetable, your next class, a room, a teacher or a service.`,
+    howAreYou: "I’m doing well, thanks! 😊 How about you? Tell me what you need: your next class, a room, a teacher…",
+    whoAmI: "I’m the ENSTP Go assistant 🤖. I know every class’s timetable, the rooms, the teachers and the school services.",
+    askClass: "Which class are you in? 🙂",
+    askGroup: (u: string) => `Which ${u.toLowerCase()}? Just reply with the number.`,
+    nowNone: "You have no class right now. 🎉",
+    nextTitle: "⏭️ **Your next class:**",
+    nowTitle: "🟢 **Right now:**",
+    firstTitle: (d: string) => `🌅 **First class ${d}:**`,
+    lastTitle: (d: string) => `🏁 **Last class ${d}:**`,
+    noMore: "No class found in the coming days.",
+    chips: { next: "My next class", today: "Today", tomorrow: "Tomorrow", place: "Where is amphi A?", who: "Who should I ask?", help: "What can you do?" },
+    group: "Group",
+    today: "today",
+    of: (d: string) => `on ${d}`,
+  },
+  ar: {
+    hi: (n: string) => `مرحبًا${n ? ` ${n}` : ""}! 👋 أنا مساعد ENSTP Go. اسألني عن جدولك، حصتك القادمة، قاعة، أستاذ أو مصلحة.`,
+    howAreYou: "بخير، شكرًا! 😊 وأنت؟ أخبرني بما تحتاج: حصتك القادمة، قاعة، أستاذ…",
+    whoAmI: "أنا مساعد ENSTP Go 🤖. أعرف جداول كل الأقسام، القاعات، الأساتذة ومصالح المدرسة.",
+    askClass: "في أي قسم تدرس؟ 🙂",
+    askGroup: (_u: string) => "ما هو رقم فوجك؟ أجب بالرقم فقط.",
+    nowNone: "ليس لديك حصة الآن. 🎉",
+    nextTitle: "⏭️ **حصتك القادمة:**",
+    nowTitle: "🟢 **الآن:**",
+    firstTitle: (d: string) => `🌅 **أول حصة ${d}:**`,
+    lastTitle: (d: string) => `🏁 **آخر حصة ${d}:**`,
+    noMore: "لا توجد حصص في الأيام القادمة.",
+    chips: { next: "حصتي القادمة", today: "اليوم", tomorrow: "غدًا", place: "أين المدرج A؟", who: "إلى من أتوجه؟", help: "ماذا تستطيع أن تفعل؟" },
+    group: "الفوج",
+    today: "اليوم",
+    of: (d: string) => `يوم ${d}`,
+  },
+};
+
+// Petites phrases en darija algérienne (lettres latines) quand l’étudiant écrit en darija
+const DZ = {
+  hi: (n: string) => `Wesh${n ? ` ${n}` : ""} ! 👋 Ana l’assistant ta3 ENSTP Go. Sa9sini 3la l’emploi du temps, le prochain cours, la salle, le prof wela les services.`,
+  hiShort: (n: string) => `Wesh${n ? ` ${n}` : ""} ! 👋`,
+  howAreYou: "Labas el hamdoulah 😊 w nta ? Wach t7taj : le prochain cours, une salle, un prof… ?",
+  thanks: "Bla mzia khouya 😊 Ila 3andek sou2al akhor, rani hna !",
+  whoAmI: "Ana l’assistant ta3 ENSTP Go 🤖. Na3ref les emplois du temps ta3 ga3 les classes, les salles, les profs w les services ta3 l’école.",
+  askClass: "F wach men classe rak ? 🙂",
+  askGroup: "Wach men groupe ? Ekteb ghir le numéro.",
+  nowNone: "Ma3andekch cours dorka 🎉",
+  nextTitle: "⏭️ **Le cours li jay :**",
+  noMore: "Ma lgit hta cours f les jours li jayin.",
+};
+const DZ_EXAMPLES = "Ex :\n- « 3andi cours ghodwa ? DIB 3ème groupe 3 »\n- « Wach 3andi dorka ? »\n- « Win kayen l’amphi A ? »\n- « Chkoun prof ta3 SOM ? »\n- « Wa9tach nkhrej lyoum ? »";
+
+const CLASS_CHIPS: Record<Lang, string[]> = {
+  fr: ["CP1", "CP2", "DIB 3ème année", "DIB 4ème année", "DIB 5ème année", "DMS 3ème année", "DMS 4ème année", "DMS 5ème année"],
+  en: ["CP1", "CP2", "DIB 3rd year", "DIB 4th year", "DIB 5th year", "DMS 3rd year", "DMS 4th year", "DMS 5th year"],
+  ar: ["CP1", "CP2", "DIB السنة الثالثة", "DIB السنة الرابعة", "DIB السنة الخامسة", "DMS السنة الثالثة", "DMS السنة الرابعة", "DMS السنة الخامسة"],
+};
+
+function lev(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 2) return 9;
+  const d = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = d[0]!;
+    d[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = d[j]!;
+      d[j] = Math.min(d[j]! + 1, d[j - 1]! + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = tmp;
+    }
+  }
+  return d[b.length]!;
+}
+
+const FR_DAYS: [string, string][] = [
+  ["samedi", "Saturday"], ["dimanche", "Sunday"], ["lundi", "Monday"], ["mardi", "Tuesday"],
+  ["mercredi", "Wednesday"], ["jeudi", "Thursday"], ["vendredi", "Friday"],
+  ["saturday", "Saturday"], ["sunday", "Sunday"], ["monday", "Monday"], ["tuesday", "Tuesday"],
+  ["wednesday", "Wednesday"], ["thursday", "Thursday"], ["friday", "Friday"],
+];
+/** « dimanch », « lundy », « mercredie »… */
+function fuzzyDay(q: string): string | null {
+  for (const w of q.split(" ")) {
+    if (w.length < 5) continue;
+    for (const [name, day] of FR_DAYS) if (lev(w, name) <= 1) return day;
+  }
+  return null;
+}
+
+const TEACHER_CUE = /(^| )(prof|profs|professeur|enseignant|enseignante|teacher|mr|mme|mrs|madame|monsieur|avec|with|استاذ|الاستاذ|الأستاذ|استاذة|الأستاذة|m3a|maa|chkoun|chkon|chkun|شكون|ostad|ostada|ostadh|lprof|leprof)( |$)/;
+function findTeacher(q: string): string | undefined {
+  const toks = q.split(" ");
+  const exact = toks.find((w) => TEACHERS.has(w));
+  if (exact) return exact;
+  // nom mal orthographié : seulement si la phrase parle d’un prof ou ne contient qu’un mot
+  if (!TEACHER_CUE.test(q) && toks.length > 1) return undefined;
+  for (const w of toks) {
+    if (w.length < 5 || STOP.has(w)) continue;
+    let best: string | undefined;
+    let bestD = 9;
+    for (const k of TEACHERS.keys()) {
+      const d = lev(w, k);
+      if (d < bestD && d <= (k.length >= 8 ? 2 : 1)) {
+        best = k;
+        bestD = d;
+      }
+    }
+    if (best) return best;
+  }
+  return undefined;
+}
+
+const GREET = /^(salut|slt|bonjour|bonsoir|bjr|hello|hi|hey|yo|salam|slm|assalam|cc|coucou|wesh|wech|ahlan|ahla|marhaba|salamou alaykoum|salam alikoum|slm alikoum|السلام عليكم|السلام|سلام|مرحبا|اهلا|أهلا)( |$)/;
+const HOW = /(^| )(ca va|cv|comment vas tu|comment tu vas|labas|la bas|labes|kirak|kiraki|kirakom|wesh rak|wech rak|wach rak|wesh raki|cv ou pas|cava|how are you|how r u|كيف حالك|لاباس|واش راك|واش راكي|كيراك)( |$)/;
+const WHO_AM_I = /(qui es tu|t es qui|tu es qui|c est quoi ton nom|who are you|what are you|شكون نتا|من انت|من أنت)/;
+const HELP = /^(aide|help|menu|que sais tu faire|tu sais faire quoi|tu peux faire quoi|what can you do|مساعدة|ماذا تستطيع)/;
+const THANKS = /^(merci|mrc|thanks|thank you|thx|ty|شكرا|saha|sahit|sa7it|yatik saha|ya3tik saha|yatik sa7a|barakallah|baraka allah|baraka allahou fik|يعطيك الصحة|صحيت|بارك الله)/;
+const OK = /^(ok|okay|d accord|dac|parfait|super|cool|top|nice|great|wakha|wah|ih|mlih|bien|s7i7|sah|واخا|مليح|صح|إيه|ايه)( |$)/;
+
+function nowParts(now: Date): { day: string; min: number } {
+  return { day: JS_DAYS[now.getDay()]!, min: now.getHours() * 60 + now.getMinutes() };
+}
+
+function sessionsFor(cls: string, unit: string): Session[] {
+  return normalizeSessions(cls, DATA[cls]?.sessions ?? []).filter((s) => sessionMatches(cls, s, unit)).sort(sortS);
+}
+
+function nextSession(cls: string, unit: string, now: Date): Session[] {
+  const { min } = nowParts(now);
+  const all = sessionsFor(cls, unit).filter((s) => s.end);
+  const order = [...JS_DAYS.slice(now.getDay()), ...JS_DAYS.slice(0, now.getDay())];
+  for (let i = 0; i < order.length; i++) {
+    const d = order[i]!;
+    const list = all.filter((s) => s.day === d && (i > 0 || toMin(s.start) > min));
+    if (list.length) {
+      const first = toMin(list[0]!.start);
+      return list.filter((s) => toMin(s.start) === first);
+    }
+  }
+  return [];
+}
+
+function suffix(cls: string, unit: string, lang: Lang): string {
+  const st = STRUCTURE[cls]!;
+  const u = unit && !st.promo ? uLabel(cls, unit, lang) : "";
+  return `📅 ${label(cls, lang)}${u ? ` — ${u}` : ""}`;
+}
+
+function defaultChips(lang: Lang): string[] {
+  const c = X[lang].chips;
+  return [c.next, c.today, c.tomorrow, c.place, c.who];
+}
+
+/** Point d’entrée de la conversation : réponse + mémoire mise à jour + suggestions. */
+export function localReply(raw: string, lang: Lang, ctx: ChatContext = {}): Reply {
+  const t = T[lang];
+  const x = X[lang];
+  const mem: Memory = { ...(ctx.memory ?? {}) };
+  const now = ctx.now ?? new Date();
+  const name = (ctx.firstName ?? "").trim();
+  const dz = isDarija(raw);
+  let q = norm(raw);
+
+  if (!q) return { text: `${x.hi(name)}\n\n${t.examples}`, memory: mem, chips: [...defaultChips(lang), X[lang].chips.help] };
+
+  // « ça va ? », puis salutation seule ou salutation + question
+  const asksHow = HOW.test(q);
+  if (asksHow) q = q.replace(HOW, " ").replace(/\s+/g, " ").trim();
+  const greeted = GREET.test(q);
+  if (greeted) q = q.replace(GREET, " ").trim();
+  const hiText = dz ? `${DZ.hi(name)}\n\n${DZ_EXAMPLES}` : `${x.hi(name)}\n\n${t.examples}`;
+  if (!q) return { text: asksHow ? (dz ? DZ.howAreYou : x.howAreYou) : hiText, memory: mem, chips: defaultChips(lang) };
+  if (THANKS.test(q)) return { text: dz ? DZ.thanks : t.thanks, memory: mem, chips: defaultChips(lang) };
+  if (OK.test(q) && q.split(" ").length <= 2) return { text: dz ? DZ.thanks : t.thanks, memory: mem, chips: defaultChips(lang) };
+  if (WHO_AM_I.test(q) || /(^| )(chkoun nta|chkoun enta|chkon nta|شكون نتا)( |$)/.test(q)) return { text: `${dz ? DZ.whoAmI : x.whoAmI}\n\n${dz ? DZ_EXAMPLES : t.examples}`, memory: mem, chips: defaultChips(lang) };
+  if (HELP.test(q)) return { text: hiText, memory: mem, chips: defaultChips(lang) };
+  const hello = greeted ? (dz ? `${DZ.hiShort(name)}\n\n` : `${x.hi(name).split("!")[0]}! 👋\n\n`) : "";
+
+  // Analyse de la question
+  let day = findDay(q, now) ?? fuzzyDay(q);
+  let time = findTime(raw);
+  let groupN = findGroupNumber(q);
+  const askedGroup = groupN != null || /^(\d{1,2})$/.test(q);
+  const explicitClass = findClass(q);
+  const teacherTok = findTeacher(q);
+
+  // Réponse courte à une question que j’ai posée (« 3 », « CP1 »…)
+  const bare = /^(\d{1,2})$/.exec(q);
+  if (bare && (mem.pending === "group" || mem.cls)) groupN = Number(bare[1]);
+
+  let intent: Intent | null = null;
+  if (/(^| )(maintenant|now|right now|actuellement|en ce moment|daba|دابا|الآن|الان|توا|tawa|drok|drk|dork|dorka|doka|dorok|derwek|darok|ضرك|دروك|درك|دوكا|ذرك)( |$)/.test(q)) intent = "now";
+  else if (/(^| )(prochain|prochaine|next|suivant|suivante|الموالية|القادمة|القادم|الجاية|الجايه|جاية|jaya|jaia|jay|jaye|li jay|li jaya|mba3d|mbe3d|من بعد|مبعد)( |$)/.test(q)) intent = "next";
+  else if (/(^| )(commence|commencer|premier cours|first class|start|debut|يبدا|نبدا|تبدا|nebda|tebda|nbda|nebdaw|bkri|sbah)( |$)/.test(q)) intent = "first";
+  else if (/(^| )(fini|finis|finit|finir|termine|terminer|dernier cours|last class|finish|نكمل|نخلص|نخرج|نكملو|nkamel|nekmel|nkmel|nekhles|nkhles|nkhrej|nekhrej|nkhorj|nfini|nfinir)( |$)/.test(q)) intent = "last";
+
+  // Mémoire : on complète ce qui manque avec la discussion précédente
+  const followUp = !explicitClass && (day != null || time != null || groupN != null || intent != null || bare != null || /^(et|and|w|ou|و) /.test(q));
+  let cls: ClassId | null = explicitClass ?? (mem.cls && STRUCTURE[mem.cls] ? mem.cls : null) ?? (ctx.defaultClass && STRUCTURE[ctx.defaultClass] ? ctx.defaultClass : null);
+  if (mem.pending === "class" && explicitClass) {
+    day = day ?? mem.day ?? null;
+    time = time ?? mem.time ?? null;
+    intent = intent ?? mem.intent ?? null;
+  }
+  if (groupN == null && cls && cls === mem.cls) groupN = mem.group ?? null;
+  if (followUp && !day && (time != null || intent === "first" || intent === "last") && mem.day) day = mem.day;
+  if (askedGroup && mem.pending === "group" && !explicitClass) {
+    day = day ?? mem.day ?? null;
+    time = time ?? mem.time ?? null;
+    intent = intent ?? mem.intent ?? null;
+  }
+
+  const wantsSchedule =
+    intent != null || day != null || time != null || explicitClass != null || (askedGroup && !teacherTok) ||
+    has(q, ["emploi", "edt", "planning", "timetable", "schedule", "جدول", "جدولي", "programme", "lprogramme", "حصة", "الحصة", "حصتي", "حصص", "الحصص", "cours", "3andi", "andi", "3andna", "عندي", "عندنا", "القراية", "9raya", "qraya", "nakra", "n9ra", "neqra", "نقرا", "نقراو"]);
+
+  if (wantsSchedule && !teacherTok) {
+    if (!cls) {
+      return {
+        text: `${hello}${dz ? DZ.askClass : x.askClass}`,
+        memory: { ...mem, pending: "class", day, time, intent: intent ?? "tt", group: groupN },
+        chips: CLASS_CHIPS[lang],
+      };
+    }
+    const st = STRUCTURE[cls]!;
+    const unit = unitFor(cls, groupN);
+    const newMem: Memory = { cls, group: unit ? groupN : null, day, time, intent: intent ?? "tt", pending: null };
+    const groupChips = !unit && !st.promo ? st.units.map((u) => uLabel(cls!, u.value, lang)) : [];
+    const askGroup = !unit && !st.promo ? `\n\n${dz ? DZ.askGroup : x.askGroup(st.unitName)}` : "";
+    if (askGroup) newMem.pending = "group";
+    const chips = groupChips.length ? groupChips : [x.chips.next, x.chips.today, x.chips.tomorrow];
+
+    if (intent === "now" || intent === "next") {
+      const { day: today, min } = nowParts(now);
+      let text = "";
+      if (intent === "now") {
+        const cur = sessionsFor(cls, unit).filter((s) => s.day === today && s.end && toMin(s.start) <= min && min < toMin(s.end));
+        text = cur.length ? `${x.nowTitle}\n${cur.map((s) => line(s, lang)).join("\n")}` : dz ? DZ.nowNone : x.nowNone;
+        if (!cur.length) {
+          const nx = nextSession(cls, unit, now);
+          if (nx.length) text += `\n\n${dz ? DZ.nextTitle : x.nextTitle}\n${nx.map((s) => line(s, lang, s.day !== today)).join("\n")}`;
+        }
+      } else {
+        const nx = nextSession(cls, unit, now);
+        text = nx.length ? `${dz ? DZ.nextTitle : x.nextTitle}\n${nx.map((s) => line(s, lang, s.day !== today)).join("\n")}` : dz ? DZ.noMore : x.noMore;
+      }
+      return { text: `${hello}${suffix(cls, unit, lang)}\n\n${text}${askGroup}`, memory: newMem, chips };
+    }
+
+    if (intent === "first" || intent === "last") {
+      const d = day ?? nowParts(now).day;
+      const list = sessionsFor(cls, unit).filter((s) => s.day === d);
+      const dn = d === nowParts(now).day && !day ? x.today : x.of(DAY_NAME[lang][d] ?? d);
+      if (!list.length) return { text: `${hello}${suffix(cls, unit, lang)}\n\n${d === "Friday" ? t.friday : t.noCourse}`, memory: { ...newMem, day: d }, chips };
+      const pick =
+        intent === "first"
+          ? list.filter((s) => toMin(s.start) === toMin(list[0]!.start))
+          : (() => {
+              const end = Math.max(...list.map((s) => toMin(s.end || s.start)));
+              return list.filter((s) => toMin(s.end || s.start) === end);
+            })();
+      const title = intent === "first" ? x.firstTitle(dn) : x.lastTitle(dn);
+      return { text: `${hello}${suffix(cls, unit, lang)}\n\n${title}\n${pick.map((s) => line(s, lang)).join("\n")}${askGroup}`, memory: { ...newMem, day: d }, chips };
+    }
+  }
+
+  // Le reste (emploi du temps classique, profs, modules, lieux, services, guide)
+  let text = core({ q, day, time, groupN, askedGroup, explicitClass, cls, teacherTok }, lang);
+  if (dz && text.startsWith(t.unknown)) text = `Ma fhemtch mlih 😅 Jarreb t9oulha b tari9a okhra.\n\n${DZ_EXAMPLES}`;
+  let memory = mem;
+  let chips = defaultChips(lang);
+  if (text === t.noClass) return { text: hello + (dz ? DZ.askClass : x.askClass), memory: { ...mem, pending: "class", day, time, intent: "tt" }, chips: CLASS_CHIPS[lang] };
+  if (wantsSchedule && cls && !teacherTok) {
+    const st = STRUCTURE[cls]!;
+    const unit = unitFor(cls, groupN);
+    memory = { cls, group: unit ? groupN : null, day, time, intent: "tt", pending: !unit && !st.promo ? "group" : null };
+    chips = !unit && !st.promo ? st.units.map((u) => uLabel(cls!, u.value, lang)) : [x.chips.next, x.chips.tomorrow, ...DAY_ORDER.filter((d) => d !== day).slice(0, 3).map((d) => DAY_NAME[lang][d] ?? d)];
+  }
+  return { text: hello + text, memory, chips };
+}
+
+/** Compatibilité : réponse texte seule. */
+export function localAnswer(raw: string, lang: Lang, ctx: ChatContext = {}): string {
+  return localReply(raw, lang, ctx).text;
+}
+
+
+// Darija écrite en lettres latines (« 3andi cours ghodwa ? ») → on répond en français
+const DARIJA = /(^| )(salam|slm|wesh|wech|wach|3andi|andi|3andna|kayen|kayna|kayn|makanch|chkoun|chkon|chkun|ta3|nta3|taa|win|wine|ghodwa|ghedwa|ghdwa|daba|drok|dork|dorka|doka|derwek|rani|raki|raho|rak|nta|nti|sahit|sa7it|saha|labas|labes|kirak|bezaf|bezzaf|chwiya|wa9tach|wqtach|waqtach|wa9ech|kifach|kifech|3lach|3lah|chhal|9ra|nakra|neqra|n9ra|mazal|khlast|kmlt|ghir|bark|sahbi|khouya|3la|m3a|bghit|nheb|lyoum|lyom|sbah|l3chiya|wakha|wah|mlih|s7i7|lhad|l7ad|letnin|tlata|larb3a|lkhmis|lsebt)( |$)/;
+/** vrai si le message est en darija algérienne écrite en lettres latines */
+export function isDarija(text: string): boolean {
+  return DARIJA.test(norm(text)) && !/[\u0600-\u06FF]/.test(text);
+}
+/** Langue de réponse : arabe, anglais ou français (la darija latine est servie en français). */
+export function chatLanguage(text: string, fallback: Lang): Lang {
+  if (isDarija(text)) return "fr";
+  return detectLanguage(text, fallback);
 }
