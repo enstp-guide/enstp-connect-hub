@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { BackLink } from "@/components/BackLink";
@@ -29,7 +29,13 @@ function Salles() {
   const [full, setFull] = useState(false);
   const [zoom, setZoom] = useState(1);
 
+  // Page publique : pas besoin de compte pour voir son emploi du temps.
+  // On retient la dernière classe choisie sur l’appareil ; un étudiant connecté retrouve celle de son profil.
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem("enstp-edt-group");
+      if (saved && GROUPS.some((x) => x.id === saved)) setGroup(saved);
+    } catch { /* ignore */ }
     supabase.auth.getUser().then(async ({ data }) => {
       setAuthed(!!data.user);
       if (!data.user) return;
@@ -38,19 +44,14 @@ function Salles() {
     });
   }, []);
 
+  const chooseGroup = (id: string) => {
+    setGroup(id);
+    try { localStorage.setItem("enstp-edt-group", id); } catch { /* ignore */ }
+  };
+
   const g = GROUPS.find((x) => x.id === group)!;
   const filtered = PLACES.filter((p) => (p.name + p.kind + p.zone).toLowerCase().includes(q.toLowerCase()));
   const sel = PLACES.find((p) => p.id === place)!;
-
-  if (authed === false)
-    return (
-      <main className="grid min-h-screen place-items-center bg-background p-6 text-center">
-        <div>
-          <p className="font-semibold">Connectez-vous pour voir votre emploi du temps.</p>
-          <Link to="/" className="mt-3 inline-block rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Se connecter</Link>
-        </div>
-      </main>
-    );
 
   return (
     <main className="min-h-screen bg-background px-4 pb-28 pt-8 text-foreground">
@@ -64,7 +65,7 @@ function Salles() {
         <section className="rounded-2xl border border-border bg-card p-4">
           <div className="flex flex-wrap items-center gap-3">
             <label className="text-sm font-semibold" htmlFor="grp">Groupe</label>
-            <select id="grp" value={group} onChange={(e) => setGroup(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2 text-sm">
+            <select id="grp" value={group} onChange={(e) => chooseGroup(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2 text-sm">
               {GROUPS.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
             </select>
             <button onClick={() => setFull(true)} className="rounded-xl border border-border px-3 py-2 text-sm font-semibold">Plein écran</button>
@@ -90,7 +91,7 @@ function Salles() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {GROUPS.filter((x) => s.ids.includes(x.id)).map((x) => (
                   <article key={x.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                    <button onClick={() => { setGroup(x.id); setFull(true); }} className="block aspect-[4/3] w-full overflow-hidden bg-muted" aria-label={`Agrandir ${x.label}`}>
+                    <button onClick={() => { chooseGroup(x.id); setFull(true); }} className="block aspect-[4/3] w-full overflow-hidden bg-muted" aria-label={`Agrandir ${x.label}`}>
                       <img src={x.img} alt={`Emploi du temps ${x.label}`} className="h-full w-full object-cover object-top" loading="lazy" decoding="async" />
                     </button>
                     <div className="space-y-2 p-3">
