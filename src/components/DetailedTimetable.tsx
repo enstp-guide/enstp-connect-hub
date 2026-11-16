@@ -46,7 +46,7 @@ export function DetailedTimetable({ group }: { group: string }) {
               <div className="w-16 shrink-0 text-sm font-bold text-primary">{s.start}<span className="block text-xs font-normal text-muted-foreground">{s.end}</span></div>
               <div className="min-w-0 text-sm">
                 <p className="font-bold">{s.subject}{s.kind ? <span className="ml-1 font-normal text-muted-foreground">· {s.kind}</span> : null}</p>
-                {s.teacher && <p className="text-muted-foreground">{s.teacher}</p>}
+                <p className="text-muted-foreground">{s.teacher || "Enseignant non précisé sur le planning officiel"}</p>
                 <p className="mt-1 text-xs">
                   {s.room && <span className="mr-2 rounded bg-muted px-1.5 py-0.5 font-semibold">Salle {s.room}</span>}
                   {s.sections.length > 0 && <span className="text-muted-foreground">{s.sections.length > 3 ? "Plusieurs groupes" : s.sections.map((x) => (/^\d+$/.test(x) && st ? `${st.unitName} ${x}` : x)).join(", ")}</span>}
