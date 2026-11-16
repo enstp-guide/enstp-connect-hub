@@ -13,7 +13,7 @@ import {
 import { splitTrilingual } from "@/lib/trilingual";
 import { browserLanguage, detectLanguage, UI_TEXT, type Lang } from "@/lib/detect-language";
 import { supabase } from "@/integrations/supabase/client";
-import { localAnswer } from "@/lib/local-assistant";
+import { chatLanguage, localReply, type Memory } from "@/lib/local-assistant";
 import { groupFor } from "@/lib/enstp-data";
 import think from "@/assets/avatar/think.webp.asset.json";
 import load from "@/assets/avatar/load.webp.asset.json";
@@ -218,6 +218,17 @@ function ChatBody({
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>(initial as unknown as Msg[]);
   const [defaultClass, setDefaultClass] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  // mémoire de la discussion (classe, groupe, jour…) reconstruite à partir de l’historique
+  const [memory, setMemory] = useState<Memory>(() => {
+    let m: Memory = {};
+    for (const msg of initial as unknown as Msg[])
+      if (msg.role === "user")
+        for (const part of msg.parts)
+          if (part.type === "text" && part.text) m = localReply(part.text, chatLanguage(part.text, lang), { memory: m }).memory;
+    return m;
+  });
+  const [chips, setChips] = useState<string[]>(() => localReply("", lang).chips);
   const ta = useRef<HTMLTextAreaElement>(null);
   useEffect(() => onBusy(false), [onBusy]);
   useEffect(() => {
@@ -229,10 +240,11 @@ function ChatBody({
       if (!data.user) return;
       const { data: p } = await supabase
         .from("profiles")
-        .select("academic_year,specialty")
+        .select("first_name,academic_year,specialty")
         .eq("id", data.user.id)
         .maybeSingle();
       if (p?.academic_year) setDefaultClass(groupFor(p.academic_year, p.specialty));
+      if (p?.first_name) setFirstName(p.first_name);
     });
   }, []);
 
@@ -246,17 +258,16 @@ function ChatBody({
   }
 
   // Réponse calculée sur l’appareil à partir des données du site : aucun crédit IA utilisé.
-  function submit() {
-    const t = input.trim();
+  function send(text: string) {
+    const t = text.trim();
     if (!t) return;
-    const l = detectLanguage(t, lang);
+    const l = chatLanguage(t, lang);
     onLang(l);
+    const r = localReply(t, l, { defaultClass, firstName, memory });
+    setMemory(r.memory);
+    setChips(r.chips);
     const userMsg: Msg = { id: crypto.randomUUID(), role: "user", parts: [{ type: "text", text: t }] };
-    const reply: Msg = {
-      id: crypto.randomUUID(),
-      role: "assistant",
-      parts: [{ type: "text", text: localAnswer(t, l, { defaultClass }) }],
-    };
+    const reply: Msg = { id: crypto.randomUUID(), role: "assistant", parts: [{ type: "text", text: r.text }] };
     const first = messages.length === 0;
     setMessages((m) => [...m, userMsg, reply]);
     setInput("");
@@ -268,6 +279,7 @@ function ChatBody({
         .eq("id", threadId)
         .then(({ error }) => error && console.error("title", error));
   }
+  const submit = () => send(input);
 
   return (
     <>
@@ -275,7 +287,7 @@ function ChatBody({
         <ConversationContent className="gap-4 p-3">
           {!messages.length && (
             <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang}>
-              <MessageResponse>{localAnswer("", lang)}</MessageResponse>
+              <MessageResponse>{localReply("", lang, { firstName }).text}</MessageResponse>
             </div>
           )}
           {messages.map((m) => (
@@ -305,6 +317,20 @@ function ChatBody({
         </ConversationContent>
       </Conversation>
       <div className="border-t border-border p-2">
+        {chips.length > 0 && (
+          <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1" aria-label="Suggestions">
+            {chips.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => send(c)}
+                className="shrink-0 rounded-full border border-primary/40 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/15"
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        )}
         <PromptInput onSubmit={submit}>
           <PromptInputTextarea
             ref={ta}
