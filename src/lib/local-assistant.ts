@@ -5,6 +5,16 @@ import { DEPTS, GROUPS, PLACES, WHO_TO_ASK } from "@/lib/enstp-data";
 import { STRUCTURE, normalizeSessions, sessionMatches } from "@/lib/edt-structure";
 import { GUIDE_KB } from "@/lib/guide-kb";
 import { detectLanguage, type Lang } from "@/lib/detect-language";
+import {
+  campusReply,
+  findDirectoryTeachers,
+  moduleTeachers,
+  moduleTeachersText,
+  placeSpotText,
+  roomSpotsText,
+  teacherCards,
+  topicReply,
+} from "@/lib/assistant-topics";
 
 type Session = {
   day: string;
@@ -30,7 +40,7 @@ const DAY_NAME: Record<Lang, Record<string, string>> = {
 const T = {
   fr: {
     hello: "Salut ! 👋 Je réponds à partir des informations du site : emplois du temps, salles, enseignants, modules et services.",
-    examples: "Exemples :\n- « Groupe 3 DIB 3ème année dimanche 8h »\n- « Emploi du temps CP1 groupe 5 lundi »\n- « Quand j’ai cours avec Gassis ? »\n- « Où est l’amphi A ? »\n- « À qui m’adresser pour une attestation ? »",
+    examples: "Exemples :\n- « Mon prochain cours » / « Groupe 3 DIB 3ème année dimanche »\n- « Qui est Mme Masrour ? » / « Email du prof de chimie 3 »\n- « Où faire du sport ? » / « Menu de la cantine demain »\n- « Bus vers Blida » / « Sortie à la Casbah »\n- « Comment justifier une absence ? »",
     thanks: "Avec plaisir ! 😊 N’hésite pas si tu as une autre question.",
     noClass: "Dis-moi ta classe pour que je trouve ton emploi du temps : CP1, CP2, DIB 3ème/4ème/5ème année ou DMS 3ème/4ème/5ème année. Exemple : « DIB 3ème année groupe 3 dimanche ».",
     noCourse: "Aucun cours trouvé pour ce créneau.",
@@ -53,7 +63,7 @@ const T = {
   },
   en: {
     hello: "Hi! 👋 I answer from the information on this site: timetables, rooms, teachers, modules and services.",
-    examples: "Examples:\n- “Group 3 DIB 3rd year Sunday 8am”\n- “CP1 timetable group 5 Monday”\n- “When do I have class with Gassis?”\n- “Where is amphi A?”\n- “Who do I ask for a certificate?”",
+    examples: "Examples:\n- “My next class” / “Group 3 DIB 3rd year Sunday”\n- “Who is Mrs Masrour?” / “Email of the chemistry 3 teacher”\n- “Where can I do sports?” / “Canteen menu tomorrow”\n- “Bus to Blida” / “Visit the Casbah”\n- “How do I justify an absence?”",
     thanks: "You’re welcome! 😊 Ask me anything else.",
     noClass: "Tell me your class so I can find your timetable: CP1, CP2, DIB 3rd/4th/5th year or DMS 3rd/4th/5th year. Example: “DIB 3rd year group 3 Sunday”.",
     noCourse: "No class found for this time slot.",
@@ -76,7 +86,7 @@ const T = {
   },
   ar: {
     hello: "مرحبًا! 👋 أجيب انطلاقًا من معلومات الموقع: جداول التوقيت، القاعات، الأساتذة، المقاييس والمصالح.",
-    examples: "أمثلة:\n- « الفوج 3 DIB السنة الثالثة الأحد 8h »\n- « جدول CP1 الفوج 5 الإثنين »\n- « متى عندي حصة مع Gassis؟ »\n- « أين المدرج A؟ »\n- « إلى من أتوجه لشهادة مدرسية؟ »",
+    examples: "أمثلة:\n- « حصتي القادمة » / « الفوج 3 DIB السنة الثالثة الأحد »\n- « شكون Masrour؟ » / « ايميل أستاذ الكيمياء 3 »\n- « وين ندير الرياضة؟ » / « قائمة المطعم غدا »\n- « حافلة إلى البليدة » / « نزهة في القصبة »\n- « كيف أبرر الغياب؟ »",
     thanks: "العفو! 😊 اسألني متى شئت.",
     noClass: "أخبرني بقسمك لأجد جدولك: CP1، CP2، DIB السنة 3/4/5 أو DMS السنة 3/4/5. مثال: « DIB السنة الثالثة الفوج 3 الأحد ».",
     noCourse: "لا توجد حصة في هذا التوقيت.",
@@ -512,7 +522,11 @@ function core(p: Parsed, lang: Lang): string {
   const roomNum = /(?:^| )(?:salle|room|classroom|قاعة|القاعة)\s*(\d{1,2})(?: |$)/.exec(q)?.[1];
   if (place || (roomNum && (wantsPlace || !day))) {
     const p = place ?? PLACES.find((x) => x.id === "salles")!;
-    let ans = `${t.roomTitle(roomNum && !place ? `${t.room} ${roomNum}` : p.name)} — ${p.zone}\n\n${p.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`;
+    // emplacement réel d’après le plan du campus quand on le connaît
+    const spot = roomNum && !place ? roomSpotsText(Number(roomNum), lang) : placeSpotText(p.id, lang);
+    let ans = spot
+      ? `${t.roomTitle(roomNum && !place ? `${t.room} ${roomNum}` : p.name)}\n\n${spot}`
+      : `${t.roomTitle(roomNum && !place ? `${t.room} ${roomNum}` : p.name)} — ${p.zone}\n\n${p.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`;
     if (p.id === "biblio") ans += LIBRARY[lang];
     if (roomNum) {
       const hits = ALL.filter((h) => norm(h.s.room).split(" ").includes(roomNum) && (!cls || h.cls === cls));
@@ -590,7 +604,7 @@ const X = {
     firstTitle: (d: string) => `🌅 **Premier cours ${d} :**`,
     lastTitle: (d: string) => `🏁 **Dernier cours ${d} :**`,
     noMore: "Aucun cours trouvé dans les prochains jours.",
-    chips: { next: "Mon prochain cours", today: "Aujourd’hui", tomorrow: "Demain", place: "Où est l’amphi A ?", who: "À qui m’adresser ?", help: "Que sais-tu faire ?" },
+    chips: { next: "Mon prochain cours", today: "Aujourd’hui", tomorrow: "Demain", place: "Menu de la cantine aujourd’hui", who: "Où faire du sport ?", help: "Que sais-tu faire ?" },
     group: "Groupe",
     today: "aujourd’hui",
     of: (d: string) => `du ${d.toLowerCase()}`,
@@ -607,7 +621,7 @@ const X = {
     firstTitle: (d: string) => `🌅 **First class ${d}:**`,
     lastTitle: (d: string) => `🏁 **Last class ${d}:**`,
     noMore: "No class found in the coming days.",
-    chips: { next: "My next class", today: "Today", tomorrow: "Tomorrow", place: "Where is amphi A?", who: "Who should I ask?", help: "What can you do?" },
+    chips: { next: "My next class", today: "Today", tomorrow: "Tomorrow", place: "Canteen menu today", who: "Where can I do sports?", help: "What can you do?" },
     group: "Group",
     today: "today",
     of: (d: string) => `on ${d}`,
@@ -624,7 +638,7 @@ const X = {
     firstTitle: (d: string) => `🌅 **أول حصة ${d}:**`,
     lastTitle: (d: string) => `🏁 **آخر حصة ${d}:**`,
     noMore: "لا توجد حصص في الأيام القادمة.",
-    chips: { next: "حصتي القادمة", today: "اليوم", tomorrow: "غدًا", place: "أين المدرج A؟", who: "إلى من أتوجه؟", help: "ماذا تستطيع أن تفعل؟" },
+    chips: { next: "حصتي القادمة", today: "اليوم", tomorrow: "غدًا", place: "قائمة المطعم اليوم", who: "أين أمارس الرياضة؟", help: "ماذا تستطيع أن تفعل؟" },
     group: "الفوج",
     today: "اليوم",
     of: (d: string) => `يوم ${d}`,
@@ -644,7 +658,7 @@ const DZ = {
   nextTitle: "⏭️ **Le cours li jay :**",
   noMore: "Ma lgit hta cours f les jours li jayin.",
 };
-const DZ_EXAMPLES = "Ex :\n- « 3andi cours ghodwa ? DIB 3ème groupe 3 »\n- « Wach 3andi dorka ? »\n- « Win kayen l’amphi A ? »\n- « Chkoun prof ta3 SOM ? »\n- « Wa9tach nkhrej lyoum ? »";
+const DZ_EXAMPLES = "Ex :\n- « 3andi cours ghodwa ? DIB 3ème groupe 3 »\n- « Wach 3andi dorka ? »\n- « Chkoun Masrour ? » / « Email prof chimie 3 »\n- « Win ndir sport ? » / « Wach kayen f la cantine lyoum ? »\n- « Bus l Blida » / « Kifach nbarer l'absence ? »";
 
 const CLASS_CHIPS: Record<Lang, string[]> = {
   fr: ["CP1", "CP2", "DIB 3ème année", "DIB 4ème année", "DIB 5ème année", "DMS 3ème année", "DMS 4ème année", "DMS 5ème année"],
@@ -682,7 +696,7 @@ function fuzzyDay(q: string): string | null {
   return null;
 }
 
-const TEACHER_CUE = /(^| )(prof|profs|professeur|enseignant|enseignante|teacher|mr|mme|mrs|madame|monsieur|avec|with|استاذ|الاستاذ|الأستاذ|استاذة|الأستاذة|m3a|maa|chkoun|chkon|chkun|شكون|ostad|ostada|ostadh|lprof|leprof)( |$)/;
+const TEACHER_CUE = /(^| )(prof|profs|professeur|enseignant|enseignante|teacher|mr|mme|mrs|madame|monsieur|avec|with|استاذ|الاستاذ|الأستاذ|أستاذ|أستاذة|استاذة|الأستاذة|m3a|maa|chkoun|chkon|chkun|شكون|ostad|ostada|ostadh|lprof|leprof)( |$)/;
 function findTeacher(q: string): string | undefined {
   const toks = q.split(" ");
   const exact = toks.find((w) => TEACHERS.has(w));
@@ -708,7 +722,7 @@ function findTeacher(q: string): string | undefined {
 const GREET = /^(salut|slt|bonjour|bonsoir|bjr|hello|hi|hey|yo|salam|slm|assalam|cc|coucou|wesh|wech|ahlan|ahla|marhaba|salamou alaykoum|salam alikoum|slm alikoum|السلام عليكم|السلام|سلام|مرحبا|اهلا|أهلا)( |$)/;
 const HOW = /(^| )(ca va|cv|comment vas tu|comment tu vas|labas|la bas|labes|kirak|kiraki|kirakom|wesh rak|wech rak|wach rak|wesh raki|cv ou pas|cava|how are you|how r u|كيف حالك|لاباس|واش راك|واش راكي|كيراك)( |$)/;
 const WHO_AM_I = /(qui es tu|t es qui|tu es qui|c est quoi ton nom|who are you|what are you|شكون نتا|من انت|من أنت)/;
-const HELP = /^(aide|help|menu|que sais tu faire|tu sais faire quoi|tu peux faire quoi|what can you do|مساعدة|ماذا تستطيع)/;
+const HELP = /^(aide|help|que sais tu faire|tu sais faire quoi|tu peux faire quoi|what can you do|مساعدة|ماذا تستطيع)/;
 const THANKS = /^(merci|mrc|thanks|thank you|thx|ty|شكرا|saha|sahit|sa7it|yatik saha|ya3tik saha|yatik sa7a|barakallah|baraka allah|baraka allahou fik|يعطيك الصحة|صحيت|بارك الله)/;
 const OK = /^(ok|okay|d accord|dac|parfait|super|cool|top|nice|great|wakha|wah|ih|mlih|bien|s7i7|sah|واخا|مليح|صح|إيه|ايه)( |$)/;
 
@@ -765,11 +779,36 @@ export function localReply(raw: string, lang: Lang, ctx: ChatContext = {}): Repl
   if (greeted) q = q.replace(GREET, " ").trim();
   const hiText = dz ? `${DZ.hi(name)}\n\n${DZ_EXAMPLES}` : `${x.hi(name)}\n\n${t.examples}`;
   if (!q) return { text: asksHow ? (dz ? DZ.howAreYou : x.howAreYou) : hiText, memory: mem, chips: defaultChips(lang) };
+  const intro = /^(je suis|je m appelle|moi c est|my name is|i am|i m|ana|smiti|اسمي|أنا)\s+(\p{L}{2,})$/u.exec(q);
+  if (intro) {
+    const who = intro[2]!.charAt(0).toUpperCase() + intro[2]!.slice(1);
+    const nice = lang === "en" ? `Nice to meet you, ${who}! 😊` : lang === "ar" ? `تشرفنا يا ${who}! 😊` : dz ? `Mar7ba bik ${who} ! 😊` : `Enchanté, ${who} ! 😊`;
+    return { text: `${nice}\n\n${dz ? DZ_EXAMPLES : t.examples}`, memory: mem, chips: defaultChips(lang) };
+  }
   if (THANKS.test(q)) return { text: dz ? DZ.thanks : t.thanks, memory: mem, chips: defaultChips(lang) };
   if (OK.test(q) && q.split(" ").length <= 2) return { text: dz ? DZ.thanks : t.thanks, memory: mem, chips: defaultChips(lang) };
   if (WHO_AM_I.test(q) || /(^| )(chkoun nta|chkoun enta|chkon nta|شكون نتا)( |$)/.test(q)) return { text: `${dz ? DZ.whoAmI : x.whoAmI}\n\n${dz ? DZ_EXAMPLES : t.examples}`, memory: mem, chips: defaultChips(lang) };
   if (HELP.test(q)) return { text: hiText, memory: mem, chips: defaultChips(lang) };
   const hello = greeted ? (dz ? `${DZ.hiShort(name)}\n\n` : `${x.hi(name).split("!")[0]}! 👋\n\n`) : "";
+
+  // Enseignants : « qui est Masrour ? », « email de Mme Kias », « prof de chimie 3 »
+  const ctxClass = findClass(q) ?? (mem.cls && STRUCTURE[mem.cls] ? mem.cls : null) ?? (ctx.defaultClass && STRUCTURE[ctx.defaultClass] ? ctx.defaultClass : null);
+  const aboutTeacher = TEACHER_CUE.test(q) || /(^| )(email|mail|e mail|contact|contacter|adresse|linkedin|qui est|c est qui|who is|qui enseigne|who teaches|شكون|chkoun|البريد|ايميل|imail)( |$)/.test(q);
+  const dirTeachers = findDirectoryTeachers(q, aboutTeacher || q.split(" ").length <= 2);
+  const ttTeacher = findTeacher(q);
+  if (dirTeachers.length || (ttTeacher && aboutTeacher)) {
+    const cards = dirTeachers.length ? teacherCards(dirTeachers, lang) : "";
+    const sessions = ttTeacher ? core({ q, day: findDay(q, now) ?? fuzzyDay(q), time: null, groupN: null, askedGroup: false, explicitClass: findClass(q), cls: null, teacherTok: ttTeacher }, lang) : "";
+    return { text: hello + [cards, sessions].filter(Boolean).join("\n\n"), memory: mem, chips: defaultChips(lang) };
+  }
+  if (aboutTeacher) {
+    const mod = moduleTeachers(q, ctxClass);
+    if (mod.length) return { text: hello + moduleTeachersText(mod, lang), memory: mem, chips: defaultChips(lang) };
+  }
+
+  // Rubriques du guide : sport, cantine, où manger, bus, sorties, démarches, clubs, résidence…
+  const topic = topicReply(q, lang, { now, cls: ctxClass, day: findDay(q, now) ?? fuzzyDay(q) });
+  if (topic) return { text: hello + topic.text, memory: mem, chips: topic.chips.length ? topic.chips : defaultChips(lang) };
 
   // Analyse de la question
   let day = findDay(q, now) ?? fuzzyDay(q);
@@ -861,7 +900,11 @@ export function localReply(raw: string, lang: Lang, ctx: ChatContext = {}): Repl
 
   // Le reste (emploi du temps classique, profs, modules, lieux, services, guide)
   let text = core({ q, day, time, groupN, askedGroup, explicitClass, cls, teacherTok }, lang);
-  if (dz && text.startsWith(t.unknown)) text = `Ma fhemtch mlih 😅 Jarreb t9oulha b tari9a okhra.\n\n${DZ_EXAMPLES}`;
+  if (text.startsWith(t.unknown) || text.startsWith(t.guideFound)) {
+    const spot = campusReply(q, lang);
+    if (spot) text = spot.text;
+    else if (dz) text = `Ma fhemtch mlih 😅 Jarreb t9oulha b tari9a okhra.\n\n${DZ_EXAMPLES}`;
+  }
   let memory = mem;
   let chips = defaultChips(lang);
   if (text === t.noClass) return { text: hello + (dz ? DZ.askClass : x.askClass), memory: { ...mem, pending: "class", day, time, intent: "tt" }, chips: CLASS_CHIPS[lang] };
