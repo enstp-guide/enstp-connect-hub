@@ -11,7 +11,7 @@ import dib from "@/assets/edt-dib.pdf.asset.json";
 import dms from "@/assets/edt-dms.pdf.asset.json";
 
 export const DEPTS = {
-  DIB: "Département des Infrastructures et du Bâtiment",
+  DIB: "Département des Infrastructures de base",
   DMS: "Département Matériaux et Structures",
 } as const;
 
