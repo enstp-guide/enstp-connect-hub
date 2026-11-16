@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import { MessageSquarePlus, Trash2, X, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Conversation, ConversationContent } from "@/components/ai-elements/conversation";
@@ -11,17 +10,11 @@ import {
   PromptInputFooter,
   PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
-import { Shimmer } from "@/components/ai-elements/shimmer";
-import {
-  Tool,
-  ToolHeader,
-  ToolContent,
-  ToolInput,
-  ToolOutput,
-} from "@/components/ai-elements/tool";
 import { splitTrilingual } from "@/lib/trilingual";
 import { browserLanguage, detectLanguage, UI_TEXT, type Lang } from "@/lib/detect-language";
 import { supabase } from "@/integrations/supabase/client";
+import { localAnswer } from "@/lib/local-assistant";
+import { groupFor } from "@/lib/enstp-data";
 import think from "@/assets/avatar/think.webp.asset.json";
 import load from "@/assets/avatar/load.webp.asset.json";
 import hai from "@/assets/avatar/hai.webp.asset.json";
@@ -208,6 +201,9 @@ function ChatThread({
   return <ChatBody threadId={threadId} initial={initial} onBusy={onBusy} lang={lang} onLang={onLang} />;
 }
 
+type Part = { type: string; text?: string; state?: string; output?: unknown };
+type Msg = { id: string; role: "user" | "assistant" | "system"; parts: Part[] };
+
 function ChatBody({
   threadId,
   initial,
@@ -220,36 +216,57 @@ function ChatBody({
   onBusy: (b: boolean) => void;
 } & LangProps) {
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<Msg[]>(initial as unknown as Msg[]);
+  const [defaultClass, setDefaultClass] = useState<string | null>(null);
   const ta = useRef<HTMLTextAreaElement>(null);
-  const transport = useMemo(
-    () =>
-      new DefaultChatTransport({
-        api: "/api/chat",
-        headers: async (): Promise<Record<string, string>> => {
-          const { data } = await supabase.auth.getSession();
-          return { Authorization: `Bearer ${data.session?.access_token ?? ""}` };
-        },
-        prepareSendMessagesRequest: ({ messages }) => ({ body: { threadId, messages } }),
-      }),
-    [threadId],
-  );
-  const { messages, sendMessage, status, error, stop } = useChat({
-    id: threadId,
-    messages: initial,
-    transport,
-  });
-  const working = status === "submitted" || status === "streaming";
-  useEffect(() => onBusy(working), [working, onBusy]);
+  useEffect(() => onBusy(false), [onBusy]);
   useEffect(() => {
     ta.current?.focus();
-  }, [status, threadId]);
+  }, [threadId]);
+  // La classe de l’étudiant (profil) sert de valeur par défaut pour ses questions d’emploi du temps.
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("academic_year,specialty")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      if (p?.academic_year) setDefaultClass(groupFor(p.academic_year, p.specialty));
+    });
+  }, []);
 
+  async function save(m: Msg) {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const { error } = await supabase
+      .from("chat_messages")
+      .insert({ thread_id: threadId, user_id: u.user.id, message: m as never });
+    if (error) console.error("save msg", error);
+  }
+
+  // Réponse calculée sur l’appareil à partir des données du site : aucun crédit IA utilisé.
   function submit() {
     const t = input.trim();
-    if (!t || working) return;
-    onLang(detectLanguage(t, lang));
-    sendMessage({ text: t });
+    if (!t) return;
+    const l = detectLanguage(t, lang);
+    onLang(l);
+    const userMsg: Msg = { id: crypto.randomUUID(), role: "user", parts: [{ type: "text", text: t }] };
+    const reply: Msg = {
+      id: crypto.randomUUID(),
+      role: "assistant",
+      parts: [{ type: "text", text: localAnswer(t, l, { defaultClass }) }],
+    };
+    const first = messages.length === 0;
+    setMessages((m) => [...m, userMsg, reply]);
     setInput("");
+    void save(userMsg).then(() => save(reply));
+    if (first)
+      void supabase
+        .from("chat_threads")
+        .update({ title: t.slice(0, 50), updated_at: new Date().toISOString() })
+        .eq("id", threadId)
+        .then(({ error }) => error && console.error("title", error));
   }
 
   return (
@@ -258,7 +275,7 @@ function ChatBody({
         <ConversationContent className="gap-4 p-3">
           {!messages.length && (
             <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang}>
-              <MessageResponse>{UI_TEXT[lang].hello}</MessageResponse>
+              <MessageResponse>{localAnswer("", lang)}</MessageResponse>
             </div>
           )}
           {messages.map((m) => (
@@ -271,42 +288,20 @@ function ChatBody({
                 }
               >
                 {m.parts.map((p, i) => {
-                  if (p.type === "text")
+                  if (p.type === "text" && p.text)
                     return m.role === "assistant" ? (
                       <TrilingualResponse key={i} text={p.text} />
                     ) : (
                       <MessageResponse key={i}>{p.text}</MessageResponse>
                     );
-                  if (p.type === "tool-get_timetable")
-                    return p.state === "output-available" ? (
-                      <PdfCard key={i} o={p.output as { label: string; pdf: string; page: number }} />
-                    ) : p.state === "output-error" ? null : (
-                      <Shimmer key={i}>{UI_TEXT[lang].thinking}</Shimmer>
-                    );
-                  if (p.type === "tool-propose_video")
-                    return (
-                      <Tool key={i} defaultOpen={false}>
-                        <ToolHeader title="Vidéo / Video / فيديو" type={p.type} state={p.state} />
-                        <ToolContent>
-                          <ToolInput input={p.input} />
-                          {p.state === "output-available" && (
-                            <VideoCard
-                              v={p.input as { title: string; url: string; description: string }}
-                            />
-                          )}
-                          {p.state === "output-error" && (
-                            <ToolOutput output={undefined} errorText={p.errorText} />
-                          )}
-                        </ToolContent>
-                      </Tool>
-                    );
+                  // anciennes conversations : carte PDF de l’ancien assistant
+                  if (p.type === "tool-get_timetable" && p.state === "output-available")
+                    return <PdfCard key={i} o={p.output as { label: string; pdf: string; page: number }} />;
                   return null;
                 })}
               </MessageContent>
             </Message>
           ))}
-          {status === "submitted" && <Shimmer>{UI_TEXT[lang].thinking}</Shimmer>}
-          {error && <p className="text-destructive">{error.message || "Erreur de l’assistant."}</p>}
         </ConversationContent>
       </Conversation>
       <div className="border-t border-border p-2">
@@ -329,12 +324,7 @@ function ChatBody({
             className="max-h-28 flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
           />
           <PromptInputFooter className="justify-end">
-            <PromptInputSubmit
-              aria-label={working ? "Arrêter" : "Envoyer"}
-              status={status}
-              onStop={stop}
-              disabled={!working && !input.trim()}
-            />
+            <PromptInputSubmit aria-label="Envoyer" status="ready" disabled={!input.trim()} />
           </PromptInputFooter>
         </PromptInput>
       </div>
@@ -368,59 +358,6 @@ function TrilingualResponse({ text }: { text: string }) {
             <MessageResponse>{section.text}</MessageResponse>
           </section>
         ))}
-    </div>
-  );
-}
-
-function VideoCard({ v }: { v: { title: string; url: string; description: string } }) {
-  const [state, setState] = useState<"ask" | "ok" | "no">("ask");
-  async function confirm() {
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) return;
-    const { error } = await supabase
-      .from("approved_videos")
-      .insert({ user_id: u.user.id, title: v.title, url: v.url, description: v.description });
-    setState(error ? "ask" : "ok");
-  }
-  return (
-    <div className="mt-2 rounded-xl border border-border bg-muted/60 p-3">
-      <p className="font-semibold">🎬 {v.title}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{v.description}</p>
-      <a
-        href={v.url}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-1 block truncate text-xs text-primary underline"
-      >
-        {v.url}
-      </a>
-      {state === "ask" ? (
-        <>
-          <p className="mt-2 text-xs font-semibold">
-            Souhaitez-vous intégrer cette vidéo explicative dans le site web ?
-          </p>
-          <div className="mt-2 flex gap-2">
-            <Button
-              variant="ghost"
-              onClick={confirm}
-              className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
-            >
-              Confirmer / Ajouter
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setState("no")}
-              className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold"
-            >
-              Refuser
-            </Button>
-          </div>
-        </>
-      ) : (
-        <p className="mt-2 text-xs font-semibold">
-          {state === "ok" ? "✅ Ajoutée à la page « L’École »." : "Vidéo refusée."}
-        </p>
-      )}
     </div>
   );
 }
